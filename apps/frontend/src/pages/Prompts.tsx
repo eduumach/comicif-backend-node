@@ -27,6 +27,7 @@ export default function Prompts() {
 
     try {
       if (editingPrompt) {
+        console.log('Updating prompt with ID:', editingPrompt.id, 'Data:', formData)
         await updatePrompt(editingPrompt.id, formData)
         setEditingPrompt(null)
       } else {
@@ -36,12 +37,14 @@ export default function Prompts() {
       setFormData({ title: '', prompt: '', person_count: 0 })
     } catch (err) {
       // Error is handled by hook
+      console.error('Submit error:', err)
     } finally {
       setSubmitting(false)
     }
   }
 
   const handleEdit = (prompt: Prompt) => {
+    console.log('HandleEdit called with prompt:', prompt)
     setFormData({
       title: prompt.title,
       prompt: prompt.prompt,
