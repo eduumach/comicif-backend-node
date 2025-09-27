@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from "react"
-import { usePhotos } from "@/hooks/usePhotos"
-import { ChevronLeft, ChevronRight, Play, Pause } from "lucide-react"
+import { useRealTimePhotos } from "@/hooks/useRealTimePhotos"
+import { ChevronLeft, ChevronRight, Play, Pause, Wifi, WifiOff } from "lucide-react"
 
 export default function EventCarousel() {
-  const { photos, refetch } = usePhotos()
+  const { photos, loading, connected } = useRealTimePhotos()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isPlaying, setIsPlaying] = useState(true)
   const [isTransitioning, setIsTransitioning] = useState(false)
@@ -25,14 +25,12 @@ export default function EventCarousel() {
     return () => clearInterval(timer)
   }, [isPlaying, photos.length])
 
-  // Auto-refresh timer (fetch new photos every 30 seconds)
+  // Reset current index when new photos are added
   useEffect(() => {
-    const refreshTimer = setInterval(() => {
-      refetch()
-    }, 30000) // 30 seconds
-
-    return () => clearInterval(refreshTimer)
-  }, [refetch])
+    if (photos.length > 0 && currentIndex >= photos.length) {
+      setCurrentIndex(0)
+    }
+  }, [photos.length, currentIndex])
 
   // Keyboard controls
   const handleKeyPress = useCallback((e: KeyboardEvent) => {
@@ -141,12 +139,37 @@ export default function EventCarousel() {
     setIsPlaying(prev => !prev)
   }
 
+  if (loading) {
+    return (
+      <div className="fixed inset-0 bg-black flex items-center justify-center">
+        <div className="text-white text-2xl text-center">
+          <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="mb-4">Carregando...</div>
+          <div className="text-lg opacity-70">Conectando ao servidor...</div>
+        </div>
+      </div>
+    )
+  }
+
   if (photos.length === 0) {
     return (
       <div className="fixed inset-0 bg-black flex items-center justify-center">
         <div className="text-white text-2xl text-center">
           <div className="mb-4">Aguardando imagens...</div>
           <div className="text-lg opacity-70">As imagens geradas aparecerão aqui automaticamente</div>
+          <div className="mt-4 flex items-center justify-center">
+            {connected ? (
+              <div className="flex items-center text-green-400 text-sm">
+                <Wifi className="w-4 h-4 mr-2" />
+                Conectado - Atualizações em tempo real
+              </div>
+            ) : (
+              <div className="flex items-center text-yellow-400 text-sm">
+                <WifiOff className="w-4 h-4 mr-2" />
+                Modo offline - Buscando atualizações...
+              </div>
+            )}
+          </div>
         </div>
       </div>
     )
@@ -223,11 +246,28 @@ export default function EventCarousel() {
           </div>
         </div>
 
-        {/* Progress Indicator */}
-        <div className="absolute top-4 right-4 bg-black/70 text-white p-3 rounded-lg">
-          <div className="flex items-center space-x-2">
-            <div className={`w-3 h-3 rounded-full ${isPlaying ? 'bg-green-500' : 'bg-red-500'}`}></div>
-            <span className="text-sm">{isPlaying ? 'Reproduzindo' : 'Pausado'}</span>
+        {/* Status Indicators */}
+        <div className="absolute top-4 right-4 space-y-2">
+          <div className="bg-black/70 text-white p-3 rounded-lg">
+            <div className="flex items-center space-x-2">
+              <div className={`w-3 h-3 rounded-full ${isPlaying ? 'bg-green-500' : 'bg-red-500'}`}></div>
+              <span className="text-sm">{isPlaying ? 'Reproduzindo' : 'Pausado'}</span>
+            </div>
+          </div>
+          <div className="bg-black/70 text-white p-3 rounded-lg">
+            <div className="flex items-center space-x-2">
+              {connected ? (
+                <>
+                  <Wifi className="w-4 h-4 text-green-400" />
+                  <span className="text-sm">Tempo Real</span>
+                </>
+              ) : (
+                <>
+                  <WifiOff className="w-4 h-4 text-yellow-400" />
+                  <span className="text-sm">Polling</span>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>

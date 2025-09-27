@@ -4,6 +4,7 @@ import { Prompt } from '../entities/Prompt';
 import { databaseService } from '../services/databaseService';
 import { googleGenAIService } from '../services/googleGenAIService';
 import { minioService } from '../services/minioService';
+import { io } from '../app';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 
@@ -45,19 +46,25 @@ export const generatePhotoFromPrompt = async (req: Request, res: Response): Prom
     const savedPhoto = await photoRepository.save(newPhoto);
     const link = await minioService.getFileUrl(fileName);
 
+    const photoResponse = {
+      id: savedPhoto.id,
+      path: link,
+      likes: savedPhoto.likes,
+      createdAt: savedPhoto.createdAt,
+      updatedAt: savedPhoto.updatedAt,
+      prompt: {
+        id: randomPrompt.id,
+        title: randomPrompt.title,
+        prompt: randomPrompt.prompt
+      }
+    };
+
+    // Emit new photo event to all connected clients
+    io.emit('new-photo', photoResponse);
+
     res.status(201).json({
       message: 'Imagem gerada e salva com sucesso',
-      photo: {
-        id: savedPhoto.id,
-        path: link,
-        likes: savedPhoto.likes,
-        createdAt: savedPhoto.createdAt,
-        prompt: {
-          id: randomPrompt.id,
-          title: randomPrompt.title,
-          prompt: randomPrompt.prompt
-        }
-      }
+      photo: photoResponse
     });
 
   } catch (error) {
@@ -189,24 +196,84 @@ export const generatePhotoFromPromptId = async (req: Request, res: Response): Pr
     const savedPhoto = await photoRepository.save(newPhoto);
     const link = await minioService.getFileUrl(fileName);
 
+    const photoResponse = {
+      id: savedPhoto.id,
+      path: link,
+      likes: savedPhoto.likes,
+      createdAt: savedPhoto.createdAt,
+      updatedAt: savedPhoto.updatedAt,
+      prompt: {
+        id: savedPhoto.prompt.id,
+        title: savedPhoto.prompt.title,
+        prompt: savedPhoto.prompt.prompt
+      }
+    };
+
+    // Emit new photo event to all connected clients
+    io.emit('new-photo', photoResponse);
+
     res.status(201).json({
       message: 'Imagem gerada e salva com sucesso',
-      photo: {
-        id: savedPhoto.id,
-        path: link,
-        likes: savedPhoto.likes,
-        createdAt: savedPhoto.createdAt,
-        updatedAt: savedPhoto.updatedAt,
-        prompt: {
-          id: savedPhoto.prompt.id,
-          title: savedPhoto.prompt.title,
-          prompt: savedPhoto.prompt.prompt
-        }
-      }
+      photo: photoResponse
     });
-    
+
   } catch (error) {
     console.error('Erro ao gerar foto:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+};
+
+export const getPhotosSince = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { timestamp } = req.params;
+
+    if (!timestamp) {
+      res.status(400).json({ error: 'Timestamp é obrigatório' });
+      return;
+    }
+
+    const sinceDate = new Date(timestamp);
+
+    if (isNaN(sinceDate.getTime())) {
+      res.status(400).json({ error: 'Timestamp inválido' });
+      return;
+    }
+
+    const photoRepository = databaseService.getDataSource().getRepository(Photo);
+
+    // Use MoreThan from TypeORM for proper date comparison
+    const { MoreThan } = await import('typeorm');
+
+    const photos = await photoRepository.find({
+      relations: ['prompt'],
+      where: {
+        createdAt: MoreThan(sinceDate)
+      },
+      order: {
+        createdAt: 'DESC'
+      }
+    });
+
+    const links = await Promise.all(photos.map(photo => minioService.getFileUrl(photo.path)));
+
+    res.json({
+      photos: photos.map((photo, index) => ({
+        id: photo.id,
+        path: links[index],
+        likes: photo.likes,
+        createdAt: photo.createdAt,
+        updatedAt: photo.updatedAt,
+        prompt: {
+          id: photo.prompt.id,
+          title: photo.prompt.title,
+          prompt: photo.prompt.prompt
+        }
+      })),
+      count: photos.length
+    });
+
+  } catch (error) {
+    console.error('Erro ao buscar fotos recentes:', error);
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
 };
