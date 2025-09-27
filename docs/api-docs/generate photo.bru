@@ -1,0 +1,19 @@
+meta {
+  name: generate photo
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{host}}/api/photos/generate
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  photo: @file(/Users/edu/Downloads/COLOR_POP.jpg)
+}
+
+settings {
+  encodeUrl: true
+}

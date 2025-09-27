@@ -4,6 +4,7 @@ import express from 'express';
 import { databaseService } from './services/databaseService';
 import promptRoutes from './routes/promptRoutes';
 import fileRoutes from './routes/fileRoutes';
+import photoRoutes from './routes/photoRoutes';
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 
 app.use('/api/prompts', promptRoutes);
 app.use('/api/files', fileRoutes);
+app.use('/api/photos', photoRoutes);
 
 databaseService.initialize()
   .then(() => {

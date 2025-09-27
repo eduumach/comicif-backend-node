@@ -1,5 +1,6 @@
 import { DataSource } from 'typeorm';
 import { Prompt } from '../entities/Prompt';
+import { Photo } from '../entities/Photo';
 
 export class DatabaseService {
   private static instance: DatabaseService;
@@ -11,12 +12,13 @@ export class DatabaseService {
       host: process.env.DB_HOST || "localhost",
       port: parseInt(process.env.DB_PORT || "5432"),
       username: process.env.DB_USERNAME || "postgres",
-      password: process.env.DB_PASSWORD || "password",
-      database: process.env.DB_NAME || "comicif_db",
+      password: process.env.DB_PASSWORD || "postgres",
+      database: process.env.DB_NAME || "comicif",
       synchronize: true, // TODO: Apenas para desenvolvimento
       logging: false,
       entities: [
-        Prompt
+        Prompt,
+        Photo
       ],
       migrations: [],
       subscribers: [],

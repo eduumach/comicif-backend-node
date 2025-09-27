@@ -5,16 +5,17 @@ meta {
 }
 
 post {
-  url: {{host}}/api/prompt
+  url: {{host}}/api/prompts
   body: json
   auth: inherit
 }
 
 body:json {
   {
-    "title": "Naturo",
-    "prompt": "Crie o naruto"
+    "title": "Harry Potter",
+    "prompt": "Create a live-action Harry Potter-inspired scene with the person in the attached reference image. Preserve their face, hairstyle, body type, skin tone, expressions, and pose exactly as shown — do not alter their features or proportions. Fully integrate and ambient the person into the scene by adjusting lighting, shadows, color balance, and reflections so that they appear naturally part of the environment, eliminating any 'cut-out' or mismatched look.\n\nCharacter Design:\nHero: Replace the previous attire with realistic Harry Potter-style wizard clothing — e.g., Hogwarts robes, house scarf, wizard’s hat, wand in hand, layered naturally over the person’s existing clothing, with realistic fabric physics and natural draping.\nPose & Action: Maintain the exact pose and movement from the reference image. Objects or props (like wand, spell book, potion vial, or broomstick) can be held naturally without changing the stance.\nExpression & Features: All facial features, hairstyle, skin tone, and expressions remain identical — no modification, stylization, or exaggeration.\n\nEnvironment & Background:\nReplace the original background with a realistic Harry Potter setting: Hogwarts castle interior, the Great Hall, a magical classroom, Diagon Alley, or a mystical outdoor scene with enchanted forests or Quidditch pitch.\nLighting, shadows, and color grading on the person must match the magical environment, including reflections and highlights on skin, clothing, and props.\nSubtle environmental effects (floating magical sparks, potion fumes, spell effects, enchanted mist) should interact naturally with the person.\n\nCompanions & Action (Optional):\nOther characters may appear (students, professors, magical creatures), but the reference person remains the central focus.\n\nTechnical Specifications:\nCamera: ARRI Alexa LF with 40mm anamorphic lens at f/2.0.\nWide cinematic framing with shallow depth of field to emphasize the central character.\nHyper-photorealistic rendering with realistic textures in skin, hair, fabrics, and magical environment.\nColor, contrast, and shadows must be adjusted to fuse the person seamlessly with the background, making them appear naturally part of the scene.\n\nKey Requirements:\nThe reference person’s face, pose, body, and expressions must remain exactly as in the attached image.\nFully ambient the person in the magical scene, adjusting lighting, shadows, colors, and reflections for perfect integration.\nAttire, props, and environment are added naturally over the original image, blending seamlessly with the reference photo.\nResult must look like a real live-action photograph, not a painting or composite.\n\nFinal Image Goal:\nThe final image should depict the reference person exactly as in the attached photo, seamlessly ambiented in a Harry Potter scene — whether casting spells, exploring Hogwarts, or walking through Diagon Alley — fully integrated with the magical environment and ready for cinematic storytelling."
   }
+  
 }
 
 settings {
