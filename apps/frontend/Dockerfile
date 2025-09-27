@@ -10,7 +10,6 @@ COPY . .
 
 RUN npm run build
 
-# Change ownership of the app directory to the node user
 RUN chown -R node:node /app
 
 EXPOSE 5173
