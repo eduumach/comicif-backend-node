@@ -5,6 +5,7 @@ import { databaseService } from './services/databaseService';
 import promptRoutes from './routes/promptRoutes';
 import fileRoutes from './routes/fileRoutes';
 import photoRoutes from './routes/photoRoutes';
+import authRoutes from './routes/authRoutes';
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ export const AppDataSource = databaseService.getDataSource();
 
 app.use(express.json());
 
+app.use('/api/auth', authRoutes);
 app.use('/api/prompts', promptRoutes);
 app.use('/api/files', fileRoutes);
 app.use('/api/photos', photoRoutes);

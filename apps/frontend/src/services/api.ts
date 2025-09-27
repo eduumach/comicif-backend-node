@@ -9,7 +9,7 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // Add auth token if available
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('comicif_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -26,7 +26,7 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Handle unauthorized
-      localStorage.removeItem('token');
+      localStorage.removeItem('comicif_token');
       window.location.href = '/login';
     }
     return Promise.reject(error);

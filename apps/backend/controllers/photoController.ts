@@ -100,3 +100,50 @@ export const listPhotos = async (req: Request, res: Response): Promise<void> => 
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
 };
+
+export const likePhoto = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const photoId = parseInt(req.params.id);
+
+    if (isNaN(photoId)) {
+      res.status(400).json({ error: 'ID da foto inválido' });
+      return;
+    }
+
+    const photoRepository = databaseService.getDataSource().getRepository(Photo);
+
+    const photo = await photoRepository.findOne({
+      where: { id: photoId },
+      relations: ['prompt']
+    });
+
+    if (!photo) {
+      res.status(404).json({ error: 'Foto não encontrada' });
+      return;
+    }
+
+    // Increment likes
+    photo.likes += 1;
+    const updatedPhoto = await photoRepository.save(photo);
+
+    // Get file URL
+    const link = await minioService.getFileUrl(updatedPhoto.path);
+
+    res.json({
+      id: updatedPhoto.id,
+      path: link,
+      likes: updatedPhoto.likes,
+      createdAt: updatedPhoto.createdAt,
+      updatedAt: updatedPhoto.updatedAt,
+      prompt: {
+        id: updatedPhoto.prompt.id,
+        title: updatedPhoto.prompt.title,
+        prompt: updatedPhoto.prompt.prompt
+      }
+    });
+
+  } catch (error) {
+    console.error('Erro ao curtir foto:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+};

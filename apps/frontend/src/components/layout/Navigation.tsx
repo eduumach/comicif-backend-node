@@ -1,11 +1,18 @@
 import { Button } from "@/components/ui/button"
 import { Link, useLocation } from "react-router-dom"
-import { Home, ImageIcon, Palette, Sparkles } from "lucide-react"
+import { useAuth } from "@/contexts/AuthContext"
+import { Home, ImageIcon, Palette, Sparkles, LogIn, LogOut } from "lucide-react"
 
 export default function Navigation() {
   const location = useLocation()
+  const { isAuthenticated, logout } = useAuth()
 
   const isActive = (path: string) => location.pathname === path
+
+  // Don't show nav on login page
+  if (location.pathname === '/login') {
+    return null
+  }
 
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -60,6 +67,30 @@ export default function Navigation() {
                 Generate
               </Link>
             </Button>
+
+            <div className="border-l pl-4">
+              {isAuthenticated ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={logout}
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </Button>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  asChild
+                >
+                  <Link to="/login">
+                    <LogIn className="h-4 w-4 mr-2" />
+                    Login
+                  </Link>
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>

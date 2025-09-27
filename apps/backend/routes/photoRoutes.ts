@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import { generatePhotoFromPrompt, listPhotos } from '../controllers/photoController';
+import { generatePhotoFromPrompt, listPhotos, likePhoto } from '../controllers/photoController';
+import { authMiddleware } from '../middleware/auth';
 import multer from 'multer';
 
 const router = Router();
@@ -18,7 +19,12 @@ const upload = multer({
   }
 });
 
-router.post('/generate', upload.single('photo'), generatePhotoFromPrompt);
+// Public routes
 router.get('/', listPhotos);
+
+// Protected routes (require authentication)
+router.post('/generate', authMiddleware, upload.single('photo'), generatePhotoFromPrompt);
+router.post('/:id/like', authMiddleware, likePhoto);
+
 
 export default router;
