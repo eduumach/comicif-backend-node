@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { config } from '@/config/env';
 
 const api = axios.create({
-  baseURL: '/api', // Vite proxy will redirect to backend
+  baseURL: config.apiBaseUrl,
   timeout: 10000,
 });
 
