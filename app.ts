@@ -2,8 +2,8 @@ import "reflect-metadata";
 import dotenv from 'dotenv';
 import express from 'express';
 import { DataSource } from 'typeorm';
-import tarefaRoutes from './routes/tarefaRoutes';
-import { Tarefa } from './entities/Tarefa';
+import { Prompt } from "./entities/Prompt";
+import promptRoutes from './routes/promptRoutes';
 
 dotenv.config();
 
@@ -20,7 +20,7 @@ export const AppDataSource = new DataSource({
   synchronize: true, // TODO: Apenas para desenvolvimento
   logging: false,
   entities: [
-    Tarefa
+    Prompt
   ],
   migrations: [],
   subscribers: [],
@@ -28,7 +28,7 @@ export const AppDataSource = new DataSource({
 
 app.use(express.json());
 
-app.use('/api', tarefaRoutes);
+app.use('/api', promptRoutes);
 AppDataSource.initialize()
   .then(() => {
     console.log("Conexão com PostgreSQL estabelecida com sucesso!");

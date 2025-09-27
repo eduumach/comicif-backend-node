@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "comicif",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
