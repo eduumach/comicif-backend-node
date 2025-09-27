@@ -29,7 +29,7 @@ export default function Gallery() {
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
-      link.download = `${photo.prompt.title || 'image'}.jpg`
+      link.download = `${photo.prompt.title || 'image'}.png`
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
