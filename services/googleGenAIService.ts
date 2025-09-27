@@ -15,12 +15,8 @@ export class GoogleGenAIService {
     });
   }
 
-  /**
-   * Gera conteúdo baseado em imagem e texto
-   */
   async generateContentFromImage(imagePath: string, prompt: string = "Caption this image.", mimeType: string = "image/jpeg"): Promise<string> {
     try {
-      // Verifica se o arquivo existe
       if (!fs.existsSync(imagePath)) {
         throw new Error(`Arquivo não encontrado: ${imagePath}`);
       }
@@ -51,9 +47,6 @@ export class GoogleGenAIService {
     }
   }
 
-  /**
-   * Gera conteúdo baseado apenas em texto
-   */
   async generateTextContent(prompt: string): Promise<string> {
     try {
       const response = await this.ai.models.generateContent({
@@ -68,9 +61,6 @@ export class GoogleGenAIService {
     }
   }
 
-  /**
-   * Gera conteúdo a partir de buffer de imagem (útil para uploads)
-   */
   async generateContentFromImageBuffer(imageBuffer: Buffer, prompt: string = "Caption this image.", mimeType: string = "image/jpeg"): Promise<string> {
     try {
       const base64Image = imageBuffer.toString('base64');
@@ -96,7 +86,43 @@ export class GoogleGenAIService {
       throw error;
     }
   }
+
+  async generateImage(textPrompt: string, referenceImageBuffer?: Buffer, mimeType: string = "image/png"): Promise<Buffer> {
+    try {
+      const contents: any[] = [{ text: textPrompt }];
+
+      if (referenceImageBuffer) {
+        const base64Image = referenceImageBuffer.toString('base64');
+        contents.push({
+          inlineData: {
+            mimeType: mimeType,
+            data: base64Image,
+          },
+        });
+      }
+
+      const response = await this.ai.models.generateContent({
+        model: "gemini-2.5-flash-image-preview",
+        contents: contents,
+      });
+
+      if (!response.candidates || !response.candidates[0] || !response.candidates[0].content || !response.candidates[0].content.parts) {
+        throw new Error("Resposta inválida da API");
+      }
+
+      for (const part of response.candidates[0].content.parts) {
+        if (part.inlineData && part.inlineData.data) {
+          const imageData = part.inlineData.data;
+          return Buffer.from(imageData, "base64");
+        }
+      }
+
+      throw new Error("Nenhuma imagem foi gerada na resposta");
+    } catch (error) {
+      console.error("Erro ao gerar imagem:", error);
+      throw error;
+    }
+  }
 }
 
-// Instância singleton do serviço
 export const googleGenAIService = new GoogleGenAIService();
