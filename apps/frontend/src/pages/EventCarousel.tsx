@@ -8,7 +8,7 @@ export default function EventCarousel() {
   const [isPlaying, setIsPlaying] = useState(true)
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [showControls, setShowControls] = useState(false)
-  const [mouseTimer, setMouseTimer] = useState<NodeJS.Timeout | null>(null)
+  const [mouseTimer, setMouseTimer] = useState<number | null>(null)
 
   // Auto-advance timer (7 seconds per image)
   useEffect(() => {
