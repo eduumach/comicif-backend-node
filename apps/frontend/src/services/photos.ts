@@ -20,6 +20,11 @@ export interface PhotosResponse {
 
 export interface GeneratePhotoData {
   promptId: number;
+  photo: File;
+}
+
+export interface GenerateRandomPhotoData {
+  photo: File;
 }
 
 export const photoService = {
@@ -29,10 +34,31 @@ export const photoService = {
     return response.data;
   },
 
-  // Generate photo from prompt
+  // Generate photo from specific prompt
   generate: async (data: GeneratePhotoData): Promise<Photo> => {
-    const response = await api.post('/photos/generate', data);
-    return response.data;
+    const formData = new FormData();
+    formData.append('promptId', data.promptId.toString());
+    formData.append('photo', data.photo);
+
+    const response = await api.post('/photos/generate-from-prompt-id', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data.photo;
+  },
+
+  // Generate photo from random prompt
+  generateRandom: async (data: GenerateRandomPhotoData): Promise<Photo> => {
+    const formData = new FormData();
+    formData.append('photo', data.photo);
+
+    const response = await api.post('/photos/generate', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data.photo;
   },
 
   // Like a photo

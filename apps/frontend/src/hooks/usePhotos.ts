@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { photoService, type Photo, type GeneratePhotoData } from '@/services/photos'
+import { photoService, type Photo, type GeneratePhotoData, type GenerateRandomPhotoData } from '@/services/photos'
 
 export function usePhotos() {
   const [photos, setPhotos] = useState<Photo[]>([])
@@ -39,6 +39,23 @@ export function usePhotos() {
     }
   }
 
+  const generateRandomPhoto = async (data: GenerateRandomPhotoData) => {
+    try {
+      setGenerating(true)
+      setError(null)
+      const newPhoto = await photoService.generateRandom(data)
+      setPhotos(prev => [newPhoto, ...prev])
+      setCount(prev => prev + 1)
+      return newPhoto
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to generate random photo'
+      setError(errorMessage)
+      throw new Error(errorMessage)
+    } finally {
+      setGenerating(false)
+    }
+  }
+
   const likePhoto = async (id: number) => {
     try {
       setError(null)
@@ -63,6 +80,7 @@ export function usePhotos() {
     error,
     generating,
     generatePhoto,
+    generateRandomPhoto,
     likePhoto,
     refetch: fetchPhotos,
   }

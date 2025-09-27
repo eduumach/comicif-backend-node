@@ -1,28 +1,64 @@
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
 import { usePrompts } from "@/hooks/usePrompts"
 import { usePhotos } from "@/hooks/usePhotos"
 import type { Prompt } from "@/services/prompts"
 import type { Photo } from "@/services/photos"
-import { Loader2, Sparkles, Image as ImageIcon, Calendar, User } from "lucide-react"
+import { Loader2, Sparkles, Image as ImageIcon, Calendar, User, Upload, Shuffle } from "lucide-react"
 
 export default function Generate() {
   const { prompts, loading: promptsLoading, error: promptsError } = usePrompts()
-  const { generatePhoto, generating, error: photosError } = usePhotos()
+  const { generatePhoto, generateRandomPhoto, generating, error: photosError } = usePhotos()
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null)
   const [generatedPhoto, setGeneratedPhoto] = useState<Photo | null>(null)
   const [showResult, setShowResult] = useState(false)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [isRandomGeneration, setIsRandomGeneration] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleGenerate = async (prompt: Prompt) => {
+    if (!selectedFile) {
+      alert('Please select an image file first')
+      return
+    }
+
     try {
       setSelectedPrompt(prompt)
-      const photo = await generatePhoto({ promptId: prompt.id })
+      setIsRandomGeneration(false)
+      const photo = await generatePhoto({ promptId: prompt.id, photo: selectedFile })
       setGeneratedPhoto(photo)
       setShowResult(true)
     } catch (err) {
       // Error is handled by hook
+    }
+  }
+
+  const handleRandomGenerate = async () => {
+    if (!selectedFile) {
+      alert('Please select an image file first')
+      return
+    }
+
+    try {
+      setSelectedPrompt(null)
+      setIsRandomGeneration(true)
+      const photo = await generateRandomPhoto({ photo: selectedFile })
+      setGeneratedPhoto(photo)
+      setShowResult(true)
+    } catch (err) {
+      // Error is handled by hook
+    }
+  }
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file && file.type.startsWith('image/')) {
+      setSelectedFile(file)
+    } else {
+      alert('Please select a valid image file')
     }
   }
 
@@ -41,9 +77,60 @@ export default function Generate() {
       <div>
         <h1 className="text-3xl font-bold">Generate Images</h1>
         <p className="text-muted-foreground">
-          Select a prompt to generate a new AI image
+          Upload an image and select a prompt to generate a new AI image
         </p>
       </div>
+
+      {/* File Upload Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Upload className="h-5 w-5 mr-2" />
+            Upload Base Image
+          </CardTitle>
+          <CardDescription>
+            Select an image file that will be used as the base for generation
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div>
+              <div className="text-sm font-medium mb-2">Image File</div>
+              <Input
+                id="photo"
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                ref={fileInputRef}
+              />
+            </div>
+            {selectedFile && (
+              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                <ImageIcon className="h-4 w-4" />
+                <span>{selectedFile.name}</span>
+              </div>
+            )}
+            <Button
+              onClick={handleRandomGenerate}
+              disabled={!selectedFile || generating}
+              className="w-full"
+              variant="outline"
+            >
+              {generating && isRandomGeneration ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Generating Random...
+                </>
+              ) : (
+                <>
+                  <Shuffle className="h-4 w-4 mr-2" />
+                  Generate with Random Prompt
+                </>
+              )}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       {error && (
         <Card className="border-destructive">
@@ -92,10 +179,10 @@ export default function Generate() {
                   </div>
                   <Button
                     onClick={() => handleGenerate(prompt)}
-                    disabled={generating}
+                    disabled={!selectedFile || generating}
                     size="sm"
                   >
-                    {generating && selectedPrompt?.id === prompt.id ? (
+                    {generating && selectedPrompt?.id === prompt.id && !isRandomGeneration ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                         Generating...
@@ -115,7 +202,7 @@ export default function Generate() {
       )}
 
       {/* Generation Status */}
-      {generating && selectedPrompt && (
+      {generating && (
         <Card className="border-primary">
           <CardContent className="pt-6">
             <div className="flex items-center space-x-3">
@@ -123,7 +210,12 @@ export default function Generate() {
               <div>
                 <p className="font-medium">Generating image...</p>
                 <p className="text-sm text-muted-foreground">
-                  Using prompt: "{selectedPrompt.title}"
+                  {isRandomGeneration
+                    ? 'Using a random prompt from the database'
+                    : selectedPrompt
+                      ? `Using prompt: "${selectedPrompt.title}"`
+                      : 'Processing...'
+                  }
                 </p>
               </div>
             </div>
@@ -144,7 +236,7 @@ export default function Generate() {
             <div className="space-y-4">
               <div className="aspect-video bg-muted rounded-lg overflow-hidden">
                 <img
-                  src={`/api/files/${generatedPhoto.path}`}
+                  src={generatedPhoto.path}
                   alt={generatedPhoto.prompt.title}
                   className="w-full h-full object-contain"
                   onError={(e) => {

@@ -147,3 +147,66 @@ export const likePhoto = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
 };
+
+export const generatePhotoFromPromptId = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { promptId } = req.body;
+    
+    if (!req.file) {
+      res.status(400).json({ error: 'Foto é obrigatória' });
+      return;
+    }
+    if (!promptId) {
+      res.status(400).json({ error: 'promptId é obrigatório' });
+      return;
+    }
+
+    const promptRepository = databaseService.getDataSource().getRepository(Prompt);
+
+    const prompt = await promptRepository.findOneBy({ id: promptId });
+
+    if (!prompt) {
+      res.status(404).json({ error: 'Prompt não encontrado no banco de dados' });
+      return;
+    }
+
+    const imageBuffer = await googleGenAIService.generateImage(
+      prompt.prompt,
+      req.file.buffer,
+      req.file.mimetype
+    );
+
+    const fileName = `generated-${uuidv4()}.png`;
+
+    await minioService.uploadFile(fileName, imageBuffer, 'image/png');
+
+    const photoRepository = databaseService.getDataSource().getRepository(Photo);
+    const newPhoto = new Photo();
+    newPhoto.path = fileName;
+    newPhoto.prompt = prompt;
+    newPhoto.likes = 0;
+
+    const savedPhoto = await photoRepository.save(newPhoto);
+    const link = await minioService.getFileUrl(fileName);
+
+    res.status(201).json({
+      message: 'Imagem gerada e salva com sucesso',
+      photo: {
+        id: savedPhoto.id,
+        path: link,
+        likes: savedPhoto.likes,
+        createdAt: savedPhoto.createdAt,
+        updatedAt: savedPhoto.updatedAt,
+        prompt: {
+          id: savedPhoto.prompt.id,
+          title: savedPhoto.prompt.title,
+          prompt: savedPhoto.prompt.prompt
+        }
+      }
+    });
+    
+  } catch (error) {
+    console.error('Erro ao gerar foto:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+};

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { generatePhotoFromPrompt, listPhotos, likePhoto } from '../controllers/photoController';
+import { generatePhotoFromPrompt, listPhotos, likePhoto, generatePhotoFromPromptId } from '../controllers/photoController';
 import { authMiddleware } from '../middleware/auth';
 import multer from 'multer';
 
@@ -25,6 +25,7 @@ router.post('/:id/like', likePhoto);
 
 // Protected routes (require authentication)
 router.post('/generate', authMiddleware, upload.single('photo'), generatePhotoFromPrompt);
+router.post('/generate-from-prompt-id', authMiddleware, upload.single('photo'), generatePhotoFromPromptId);
 
 
 export default router;
