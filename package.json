@@ -21,7 +21,16 @@
   "devDependencies": {
     "concurrently": "^8.2.2"
   },
-  "keywords": ["monorepo", "backend", "frontend", "api"],
+  "keywords": [
+    "monorepo",
+    "backend",
+    "frontend",
+    "api"
+  ],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@types/cors": "^2.8.19",
+    "cors": "^2.8.5"
+  }
 }

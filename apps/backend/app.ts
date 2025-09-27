@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import dotenv from 'dotenv';
 import express from 'express';
+import cors from 'cors';
 import { databaseService } from './services/databaseService';
 import promptRoutes from './routes/promptRoutes';
 import fileRoutes from './routes/fileRoutes';
@@ -13,6 +14,11 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 export const AppDataSource = databaseService.getDataSource();
+
+app.use(cors({
+  origin: ['https://comicif.rifeeh.com', 'http://localhost:3000', 'http://localhost:5173'],
+  credentials: true
+}));
 
 app.use(express.json());
 
