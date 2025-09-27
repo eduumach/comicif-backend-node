@@ -8,13 +8,20 @@ export class MinioService {
   private bucketName: string;
 
   constructor() {
-    this.client = new Client({
+    const config: any = {
       endPoint: process.env.MINIO_ENDPOINT || 'localhost',
-      port: parseInt(process.env.MINIO_PORT || '9000'),
       useSSL: process.env.MINIO_USE_SSL === 'true',
       accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
       secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
-    });
+    };
+
+    // Only set port if not using SSL on port 443
+    const port = parseInt(process.env.MINIO_PORT || '9000');
+    if (!(config.useSSL && port === 443)) {
+      config.port = port;
+    }
+
+    this.client = new Client(config);
 
     this.bucketName = process.env.MINIO_BUCKET_NAME || 'comicif-bucket';
     this.initializeBucket();
