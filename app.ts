@@ -4,6 +4,7 @@ import express from 'express';
 import { DataSource } from 'typeorm';
 import { Prompt } from "./entities/Prompt";
 import promptRoutes from './routes/promptRoutes';
+import fileRoutes from './routes/fileRoutes';
 
 dotenv.config();
 
@@ -28,7 +29,8 @@ export const AppDataSource = new DataSource({
 
 app.use(express.json());
 
-app.use('/api', promptRoutes);
+app.use('/api/prompts', promptRoutes);
+app.use('/api/files', fileRoutes);
 AppDataSource.initialize()
   .then(() => {
     console.log("Conexão com PostgreSQL estabelecida com sucesso!");
