@@ -12,6 +12,9 @@ export class Prompt {
   @Column({ type: 'text' })
   prompt: string;
 
+  @Column({ type: 'int', nullable: true, default: 0 })
+  person_count: number;
+
   @CreateDateColumn()
   createdAt: Date;
 

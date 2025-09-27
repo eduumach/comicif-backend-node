@@ -5,15 +5,17 @@ import { databaseService } from "../services/databaseService";
 export const listPrompts = (req: Request, res: Response): void => {
     const promptRepository = databaseService.getDataSource().getRepository(Prompt);
     promptRepository.find().then(prompts => {
+        console.log("Prompts encontrados:", prompts);
         res.json(prompts);
     });
 };
 
 export const createPrompt = (req: Request, res: Response): void => {
-    const { title, prompt }: { title: string; prompt: string } = req.body;
+    const { title, prompt, person_count }: { title: string; prompt: string, person_count: number } = req.body;
     const newPrompt = new Prompt();
     newPrompt.title = title;
     newPrompt.prompt = prompt;
+    newPrompt.person_count = person_count;
     const promptRepository = databaseService.getDataSource().getRepository(Prompt);
     promptRepository.save(newPrompt);
 
@@ -34,12 +36,13 @@ export const getPromptById = (req: Request, res: Response): void => {
 
 export const updatePrompt = (req: Request, res: Response): void => {
     const { id } = req.params;
-    const { title, prompt }: { title: string; prompt: string } = req.body;
+    const { title, prompt, person_count }: { title: string; prompt: string; person_count: number } = req.body;
     const promptRepository = databaseService.getDataSource().getRepository(Prompt);
     promptRepository.findOneBy({ id: parseInt(id) }).then(existingPrompt => {
         if (existingPrompt) {
             existingPrompt.title = title;
             existingPrompt.prompt = prompt;
+            existingPrompt.person_count = person_count;
             promptRepository.save(existingPrompt);
             res.json(existingPrompt);
         }
