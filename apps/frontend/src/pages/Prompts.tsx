@@ -77,25 +77,26 @@ export default function Prompts() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Prompts</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold">Prompts</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Create and manage your AI prompts
           </p>
         </div>
 
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <Button className="w-full sm:w-auto min-h-[44px]">
               <Plus className="h-4 w-4 mr-2" />
-              New Prompt
+              <span className="hidden sm:inline">New Prompt</span>
+              <span className="sm:hidden">New</span>
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-[95vw] sm:max-w-lg max-h-[95vh] p-3 sm:p-6">
             <DialogHeader>
-              <DialogTitle>Create New Prompt</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-lg">Create New Prompt</DialogTitle>
+              <DialogDescription className="text-sm">
                 Add a new prompt for AI image generation
               </DialogDescription>
             </DialogHeader>
@@ -107,6 +108,7 @@ export default function Prompts() {
                     value={formData.title}
                     onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                     placeholder="Enter prompt title"
+                    className="min-h-[44px]"
                     required
                   />
                 </div>
@@ -116,7 +118,7 @@ export default function Prompts() {
                     value={formData.prompt}
                     onChange={(e) => setFormData(prev => ({ ...prev, prompt: e.target.value }))}
                     placeholder="Enter your AI prompt"
-                    className="min-h-[100px] max-h-[300px] resize-none overflow-y-auto"
+                    className="min-h-[100px] max-h-[200px] sm:max-h-[300px] resize-none overflow-y-auto"
                     required
                   />
                 </div>
@@ -128,14 +130,15 @@ export default function Prompts() {
                     value={formData.person_count}
                     onChange={(e) => setFormData(prev => ({ ...prev, person_count: parseInt(e.target.value) || 0 }))}
                     placeholder="Number of people in the image"
+                    className="min-h-[44px]"
                   />
                 </div>
               </div>
-              <DialogFooter className="mt-6">
-                <Button type="button" variant="outline" onClick={resetForm}>
+              <DialogFooter className="mt-6 flex-col sm:flex-row gap-2">
+                <Button type="button" variant="outline" onClick={resetForm} className="w-full sm:w-auto min-h-[44px]">
                   Cancel
                 </Button>
-                <Button type="submit" disabled={submitting}>
+                <Button type="submit" disabled={submitting} className="w-full sm:w-auto min-h-[44px]">
                   {submitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                   Create
                 </Button>
@@ -167,81 +170,143 @@ export default function Prompts() {
               <p className="text-sm text-muted-foreground">Create your first prompt to get started</p>
             </div>
           ) : (
-            <div className="max-h-[600px] overflow-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Prompt</TableHead>
-                    <TableHead>People</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {prompts.map((prompt) => (
-                    <TableRow key={prompt.id}>
-                      <TableCell className="font-medium">{prompt.title}</TableCell>
-                      <TableCell className="max-w-md">
-                        <div className="max-h-20 overflow-y-auto text-sm">
-                          {prompt.prompt}
-                        </div>
-                      </TableCell>
-                      <TableCell>{prompt.person_count}</TableCell>
-                      <TableCell>
-                        {new Date(prompt.createdAt).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end space-x-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleEdit(prompt)}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button size="sm" variant="destructive">
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Delete Prompt</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Are you sure you want to delete "{prompt.title}"?
-                                  This action cannot be undone.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => handleDelete(prompt.id)}
-                                  className="bg-destructive hover:bg-destructive/90"
-                                >
-                                  Delete
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                      </TableCell>
+            <>
+              {/* Desktop Table View */}
+              <div className="hidden lg:block max-h-[600px] overflow-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Prompt</TableHead>
+                      <TableHead>People</TableHead>
+                      <TableHead>Created</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                  </TableHeader>
+                  <TableBody>
+                    {prompts.map((prompt) => (
+                      <TableRow key={prompt.id}>
+                        <TableCell className="font-medium">{prompt.title}</TableCell>
+                        <TableCell className="max-w-md">
+                          <div className="max-h-20 overflow-y-auto text-sm">
+                            {prompt.prompt}
+                          </div>
+                        </TableCell>
+                        <TableCell>{prompt.person_count}</TableCell>
+                        <TableCell>
+                          {new Date(prompt.createdAt).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end space-x-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleEdit(prompt)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button size="sm" variant="destructive">
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete Prompt</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to delete "{prompt.title}"?
+                                    This action cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleDelete(prompt.id)}
+                                    className="bg-destructive hover:bg-destructive/90"
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Mobile/Tablet Card View */}
+              <div className="lg:hidden space-y-3 max-h-[600px] overflow-auto">
+                {prompts.map((prompt) => (
+                  <Card key={prompt.id} className="border">
+                    <CardContent className="p-4">
+                      <div className="space-y-3">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-medium text-base truncate">{prompt.title}</h3>
+                            <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
+                              <span>People: {prompt.person_count}</span>
+                              <span>{new Date(prompt.createdAt).toLocaleDateString()}</span>
+                            </div>
+                          </div>
+                          <div className="flex gap-2 ml-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleEdit(prompt)}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button size="sm" variant="destructive" className="h-8 w-8 p-0">
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete Prompt</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to delete "{prompt.title}"?
+                                    This action cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleDelete(prompt.id)}
+                                    className="bg-destructive hover:bg-destructive/90"
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </div>
+                        <div className="bg-muted/50 rounded-md p-3">
+                          <p className="text-sm line-clamp-4">{prompt.prompt}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
 
       {/* Edit Dialog */}
       <Dialog open={!!editingPrompt} onOpenChange={(open) => !open && setEditingPrompt(null)}>
-        <DialogContent>
+        <DialogContent className="max-w-[95vw] sm:max-w-lg max-h-[95vh] p-3 sm:p-6">
           <DialogHeader>
-            <DialogTitle>Edit Prompt</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-lg">Edit Prompt</DialogTitle>
+            <DialogDescription className="text-sm">
               Update your prompt details
             </DialogDescription>
           </DialogHeader>
@@ -253,6 +318,7 @@ export default function Prompts() {
                   value={formData.title}
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                   placeholder="Enter prompt title"
+                  className="min-h-[44px]"
                   required
                 />
               </div>
@@ -262,7 +328,7 @@ export default function Prompts() {
                   value={formData.prompt}
                   onChange={(e) => setFormData(prev => ({ ...prev, prompt: e.target.value }))}
                   placeholder="Enter your AI prompt"
-                  className="min-h-[100px] max-h-[300px] resize-none overflow-y-auto"
+                  className="min-h-[100px] max-h-[200px] sm:max-h-[300px] resize-none overflow-y-auto"
                   required
                 />
               </div>
@@ -274,14 +340,15 @@ export default function Prompts() {
                   value={formData.person_count}
                   onChange={(e) => setFormData(prev => ({ ...prev, person_count: parseInt(e.target.value) || 0 }))}
                   placeholder="Number of people in the image"
+                  className="min-h-[44px]"
                 />
               </div>
             </div>
-            <DialogFooter className="mt-6">
-              <Button type="button" variant="outline" onClick={resetForm}>
+            <DialogFooter className="mt-6 flex-col sm:flex-row gap-2">
+              <Button type="button" variant="outline" onClick={resetForm} className="w-full sm:w-auto min-h-[44px]">
                 Cancel
               </Button>
-              <Button type="submit" disabled={submitting}>
+              <Button type="submit" disabled={submitting} className="w-full sm:w-auto min-h-[44px]">
                 {submitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 Update
               </Button>

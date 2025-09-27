@@ -37,18 +37,18 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
+        <CardHeader className="text-center p-4 sm:p-6">
           <div className="flex justify-center mb-4">
             <div className="p-3 bg-primary/10 rounded-full">
               <Lock className="h-6 w-6 text-primary" />
             </div>
           </div>
-          <CardTitle className="text-2xl">Login to ComicIF</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-xl sm:text-2xl">Login to ComicIF</CardTitle>
+          <CardDescription className="text-sm">
             Enter your password to access the admin features
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 sm:p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Input
@@ -57,6 +57,7 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
+                className="min-h-[44px]"
               />
             </div>
 
@@ -66,7 +67,7 @@ export default function Login() {
               </div>
             )}
 
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full min-h-[44px]" disabled={loading}>
               {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -80,7 +81,7 @@ export default function Login() {
 
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
-              Default password: <code className="bg-muted px-2 py-1 rounded">admin123</code>
+              Default password: <code className="bg-muted px-2 py-1 rounded text-xs sm:text-sm">admin123</code>
             </p>
           </div>
         </CardContent>

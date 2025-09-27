@@ -8,23 +8,23 @@ export default function Home() {
   return (
     <div className="space-y-8">
       <header className="text-center">
-        <h1 className="text-4xl font-bold mb-2">ComicIF</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-3xl sm:text-4xl font-bold mb-2">ComicIF</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
           Generate amazing images with AI-powered prompts
         </p>
       </header>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         <Card>
-          <CardHeader>
-            <CardTitle>Prompts</CardTitle>
-            <CardDescription>
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-lg sm:text-xl">Prompts</CardTitle>
+            <CardDescription className="text-sm">
               Create and manage your AI prompts
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 sm:p-6 pt-0">
             <Button
-              className="w-full"
+              className="w-full min-h-[44px]"
               onClick={() => navigate('/prompts')}
             >
               Manage Prompts
@@ -33,15 +33,15 @@ export default function Home() {
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Gallery</CardTitle>
-            <CardDescription>
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-lg sm:text-xl">Gallery</CardTitle>
+            <CardDescription className="text-sm">
               View all generated images
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 sm:p-6 pt-0">
             <Button
-              className="w-full"
+              className="w-full min-h-[44px]"
               variant="outline"
               onClick={() => navigate('/gallery')}
             >
@@ -51,15 +51,15 @@ export default function Home() {
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Generate</CardTitle>
-            <CardDescription>
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-lg sm:text-xl">Generate</CardTitle>
+            <CardDescription className="text-sm">
               Create new images from prompts
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 sm:p-6 pt-0">
             <Button
-              className="w-full"
+              className="w-full min-h-[44px]"
               variant="secondary"
               onClick={() => navigate('/generate')}
             >
