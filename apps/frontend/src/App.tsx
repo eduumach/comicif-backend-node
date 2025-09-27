@@ -7,6 +7,7 @@ import Prompts from "./pages/Prompts"
 import Gallery from "./pages/Gallery"
 import Generate from "./pages/Generate"
 import Login from "./pages/Login"
+import EventCarousel from "./pages/EventCarousel"
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/event-carousel" element={<EventCarousel />} />
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route
