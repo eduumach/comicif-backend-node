@@ -5,7 +5,6 @@ import { databaseService } from "../services/databaseService";
 export const listPrompts = (req: Request, res: Response): void => {
     const promptRepository = databaseService.getDataSource().getRepository(Prompt);
     promptRepository.find().then(prompts => {
-        console.log("Prompts encontrados:", prompts);
         res.json(prompts);
     });
 };
