@@ -120,7 +120,7 @@ export default function Gallery() {
             <div className="space-y-4">
               <div className="aspect-video bg-muted rounded-lg overflow-hidden">
                 <img
-                  src={`/api/files/${selectedPhoto.path}`}
+                  src={selectedPhoto.path}
                   alt={selectedPhoto.prompt.title}
                   className="w-full h-full object-contain"
                   onError={(e) => {

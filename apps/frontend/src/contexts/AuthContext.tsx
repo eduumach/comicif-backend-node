@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
+import { config } from '@/config/env'
 
 interface AuthContextType {
   isAuthenticated: boolean
@@ -25,7 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (password: string) => {
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(`${config.apiBaseUrl}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
