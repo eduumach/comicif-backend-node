@@ -7,7 +7,7 @@ import { usePrompts } from "@/hooks/usePrompts"
 import { usePhotos } from "@/hooks/usePhotos"
 import type { Prompt } from "@/services/prompts"
 import type { Photo } from "@/services/photos"
-import { Loader2, Sparkles, Image as ImageIcon, Calendar, User, Upload, Shuffle, Camera, X } from "lucide-react"
+import { Loader2, Sparkles, Image as ImageIcon, Calendar, User, Upload, Shuffle, Camera } from "lucide-react"
 
 export default function Generate() {
   const { prompts, loading: promptsLoading, error: promptsError } = usePrompts()
