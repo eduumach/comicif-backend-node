@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { photoService, type Photo, type PhotosResponse, type GeneratePhotoData } from '@/services/photos'
+import { photoService, type Photo, type GeneratePhotoData } from '@/services/photos'
 
 export function usePhotos() {
   const [photos, setPhotos] = useState<Photo[]>([])
