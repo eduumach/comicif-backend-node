@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { Prompt } from "../entities/Prompt";
-import { AppDataSource } from "../app";
+import { databaseService } from "../services/databaseService";
 
 export const listPrompts = (req: Request, res: Response): void => {
-    const promptRepository = AppDataSource.getRepository(Prompt);
+    const promptRepository = databaseService.getDataSource().getRepository(Prompt);
     promptRepository.find().then(prompts => {
         res.json(prompts);
     });
@@ -14,7 +14,7 @@ export const createPrompt = (req: Request, res: Response): void => {
     const newPrompt = new Prompt();
     newPrompt.title = title;
     newPrompt.prompt = prompt;
-    const promptRepository = AppDataSource.getRepository(Prompt);
+    const promptRepository = databaseService.getDataSource().getRepository(Prompt);
     promptRepository.save(newPrompt);
 
     res.status(201).json(newPrompt);
@@ -22,7 +22,7 @@ export const createPrompt = (req: Request, res: Response): void => {
 
 export const getPromptById = (req: Request, res: Response): void => {
     const { id } = req.params;
-    const promptRepository = AppDataSource.getRepository(Prompt);
+    const promptRepository = databaseService.getDataSource().getRepository(Prompt);
     promptRepository.findOneBy({ id: parseInt(id) }).then(prompt => {
         if (prompt) {
             res.json(prompt);
@@ -35,7 +35,7 @@ export const getPromptById = (req: Request, res: Response): void => {
 export const updatePrompt = (req: Request, res: Response): void => {
     const { id } = req.params;
     const { title, prompt }: { title: string; prompt: string } = req.body;
-    const promptRepository = AppDataSource.getRepository(Prompt);
+    const promptRepository = databaseService.getDataSource().getRepository(Prompt);
     promptRepository.findOneBy({ id: parseInt(id) }).then(existingPrompt => {
         if (existingPrompt) {
             existingPrompt.title = title;
@@ -51,7 +51,7 @@ export const updatePrompt = (req: Request, res: Response): void => {
 
 export const deletePrompt = (req: Request, res: Response): void => {
     const { id } = req.params;
-    const promptRepository = AppDataSource.getRepository(Prompt);
+    const promptRepository = databaseService.getDataSource().getRepository(Prompt);
     promptRepository.findOneBy({ id: parseInt(id) }).then(existingPrompt => {
         if (existingPrompt) {
             promptRepository.remove(existingPrompt);
