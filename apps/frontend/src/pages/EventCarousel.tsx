@@ -7,6 +7,8 @@ export default function EventCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isPlaying, setIsPlaying] = useState(true)
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const [showControls, setShowControls] = useState(false)
+  const [mouseTimer, setMouseTimer] = useState<NodeJS.Timeout | null>(null)
 
   // Auto-advance timer (7 seconds per image)
   useEffect(() => {
@@ -72,6 +74,39 @@ export default function EventCarousel() {
     return () => document.removeEventListener('keydown', handleKeyPress)
   }, [handleKeyPress])
 
+  // Mouse movement handler
+  const handleMouseMove = useCallback(() => {
+    setShowControls(true)
+
+    // Clear existing timer
+    if (mouseTimer) {
+      clearTimeout(mouseTimer)
+    }
+
+    // Set new timer to hide controls after 3 seconds of inactivity
+    const timer = setTimeout(() => {
+      setShowControls(false)
+    }, 3000)
+
+    setMouseTimer(timer)
+  }, [mouseTimer])
+
+  // Mouse move effect
+  useEffect(() => {
+    document.addEventListener('mousemove', handleMouseMove)
+
+    // Start with controls hidden after 3 seconds
+    const initialTimer = setTimeout(() => {
+      setShowControls(false)
+    }, 3000)
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      if (mouseTimer) clearTimeout(mouseTimer)
+      clearTimeout(initialTimer)
+    }
+  }, [handleMouseMove])
+
   // Auto-enter fullscreen on mount
   useEffect(() => {
     const enterFullscreen = async () => {
@@ -120,7 +155,7 @@ export default function EventCarousel() {
   const currentPhoto = photos[currentIndex]
 
   return (
-    <div className="fixed inset-0 bg-black overflow-hidden cursor-none group">
+    <div className="fixed inset-0 bg-black overflow-hidden cursor-none">
       {/* Main Image */}
       <div className="relative w-full h-full flex items-center justify-center">
         <img
@@ -142,8 +177,8 @@ export default function EventCarousel() {
         )}
       </div>
 
-      {/* Controls Overlay - Only visible on hover */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+      {/* Controls Overlay - Only visible when mouse moves */}
+      <div className={`absolute inset-0 transition-opacity duration-500 ${showControls ? 'opacity-100' : 'opacity-0'}`}>
         {/* Navigation Buttons */}
         <button
           onClick={previousImage}
