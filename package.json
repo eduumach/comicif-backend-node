@@ -1,38 +1,27 @@
 {
-  "name": "comicif-backend-node",
+  "name": "comicif-monorepo",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Comicif monorepo with backend and frontend applications",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
   "scripts": {
-    "start": "ts-node app.ts",
-    "dev": "nodemon --exec ts-node app.ts",
-    "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "dependencies": {
-    "@google/genai": "^1.21.0",
-    "@types/express": "^5.0.3",
-    "@types/minio": "^7.1.0",
-    "@types/multer": "^2.0.0",
-    "@types/node": "^24.5.2",
-    "@types/uuid": "^10.0.0",
-    "dotenv": "^17.2.2",
-    "express": "^5.1.0",
-    "minio": "^8.0.6",
-    "multer": "^2.0.2",
-    "pg": "^8.16.3",
-    "reflect-metadata": "^0.2.2",
-    "ts-node": "^10.9.2",
-    "typeorm": "^0.3.27",
-    "typescript": "^5.9.2",
-    "uuid": "^13.0.0"
+    "dev": "concurrently \"npm run dev --workspace=apps/backend\" \"npm run dev --workspace=apps/frontend\"",
+    "build": "npm run build --workspaces",
+    "start": "npm run start --workspace=apps/backend",
+    "test": "npm run test --workspaces",
+    "backend:dev": "npm run dev --workspace=apps/backend",
+    "backend:build": "npm run build --workspace=apps/backend",
+    "backend:start": "npm run start --workspace=apps/backend",
+    "frontend:dev": "npm run dev --workspace=apps/frontend",
+    "frontend:build": "npm run build --workspace=apps/frontend",
+    "frontend:start": "npm run start --workspace=apps/frontend"
   },
   "devDependencies": {
-    "@types/pg": "^8.15.5",
-    "nodemon": "^3.1.10"
-  }
+    "concurrently": "^8.2.2"
+  },
+  "keywords": ["monorepo", "backend", "frontend", "api"],
+  "author": "",
+  "license": "ISC"
 }
