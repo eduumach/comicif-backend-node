@@ -248,9 +248,9 @@ export default function Generate() {
               <div className="space-y-2">
                 <div>
                   <h4 className="font-medium">{generatedPhoto.prompt.title}</h4>
-                  <p className="text-sm text-muted-foreground">
+                  {/* <p className="text-sm text-muted-foreground">
                     {generatedPhoto.prompt.prompt}
-                  </p>
+                  </p> */}
                 </div>
 
                 <div className="flex items-center justify-between">

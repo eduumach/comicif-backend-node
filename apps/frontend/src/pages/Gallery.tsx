@@ -74,9 +74,6 @@ export default function Gallery() {
               </div>
               <CardContent className="p-4">
                 <h3 className="font-medium truncate mb-1">{photo.prompt.title}</h3>
-                <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                  {photo.prompt.prompt}
-                </p>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3 text-sm text-muted-foreground">
                     <div className="flex items-center">
@@ -130,10 +127,6 @@ export default function Gallery() {
               </div>
 
               <div className="space-y-2">
-                <div>
-                  <h4 className="font-medium">Prompt</h4>
-                  <p className="text-sm text-muted-foreground">{selectedPhoto.prompt.prompt}</p>
-                </div>
 
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center space-x-4">
