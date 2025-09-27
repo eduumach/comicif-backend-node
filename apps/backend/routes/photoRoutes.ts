@@ -21,10 +21,10 @@ const upload = multer({
 
 // Public routes
 router.get('/', listPhotos);
+router.post('/:id/like', likePhoto);
 
 // Protected routes (require authentication)
 router.post('/generate', authMiddleware, upload.single('photo'), generatePhotoFromPrompt);
-router.post('/:id/like', authMiddleware, likePhoto);
 
 
 export default router;
