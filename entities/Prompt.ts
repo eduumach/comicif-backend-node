@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { Photo } from './Photo';
 
 @Entity('prompt')
 export class Prompt {
@@ -16,4 +17,7 @@ export class Prompt {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => Photo, (photo) => photo.prompt)
+  photos: Photo[];
 }
