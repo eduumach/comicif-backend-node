@@ -29,8 +29,5 @@
   ],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "@types/cors": "^2.8.19",
-    "cors": "^2.8.5"
-  }
+  "dependencies": {}
 }
