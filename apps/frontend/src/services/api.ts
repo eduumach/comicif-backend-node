@@ -3,7 +3,7 @@ import { config } from '@/config/env';
 
 const api = axios.create({
   baseURL: config.apiBaseUrl,
-  timeout: 10000,
+  timeout: 100000,
 });
 
 // Request interceptor
