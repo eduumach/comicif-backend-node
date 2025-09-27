@@ -1,11 +1,11 @@
 meta {
-  name: retrieve prompts
+  name: delete prompt
   type: http
-  seq: 3
+  seq: 6
 }
 
-get {
-  url: {{host}}/api/prompt
+delete {
+  url: {{host}}/api/prompt/1
   body: none
   auth: inherit
 }

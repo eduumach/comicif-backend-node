@@ -1,0 +1,22 @@
+meta {
+  name: update prompt
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{host}}/api/prompt/1
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "title": "Naruto Updated",
+    "prompt": "Crie o Naruto com mais detalhes"
+  }
+}
+
+settings {
+  encodeUrl: true
+}

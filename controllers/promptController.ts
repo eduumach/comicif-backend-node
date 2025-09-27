@@ -19,3 +19,45 @@ export const createPrompt = (req: Request, res: Response): void => {
 
     res.status(201).json(newPrompt);
 };
+
+export const getPromptById = (req: Request, res: Response): void => {
+    const { id } = req.params;
+    const promptRepository = AppDataSource.getRepository(Prompt);
+    promptRepository.findOneBy({ id: parseInt(id) }).then(prompt => {
+        if (prompt) {
+            res.json(prompt);
+        } else {
+            res.status(404).json({ message: "Prompt not found" });
+        }
+    });
+};
+
+export const updatePrompt = (req: Request, res: Response): void => {
+    const { id } = req.params;
+    const { title, prompt }: { title: string; prompt: string } = req.body;
+    const promptRepository = AppDataSource.getRepository(Prompt);
+    promptRepository.findOneBy({ id: parseInt(id) }).then(existingPrompt => {
+        if (existingPrompt) {
+            existingPrompt.title = title;
+            existingPrompt.prompt = prompt;
+            promptRepository.save(existingPrompt);
+            res.json(existingPrompt);
+        }
+        else {
+            res.status(404).json({ message: "Prompt not found" });
+        }
+    });
+};
+
+export const deletePrompt = (req: Request, res: Response): void => {
+    const { id } = req.params;
+    const promptRepository = AppDataSource.getRepository(Prompt);
+    promptRepository.findOneBy({ id: parseInt(id) }).then(existingPrompt => {
+        if (existingPrompt) {
+            promptRepository.remove(existingPrompt);
+            res.status(204).send();
+        } else {
+            res.status(404).json({ message: "Prompt not found" });
+        }
+    });
+};
