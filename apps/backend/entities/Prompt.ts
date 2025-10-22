@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { Photo } from './Photo';
+import { MediaCategory } from '../types/MediaCategory';
 
 @Entity('prompt')
 export class Prompt {
@@ -14,6 +15,14 @@ export class Prompt {
 
   @Column({ type: 'int', nullable: true, default: 0 })
   person_count: number;
+
+  @Column({
+    type: 'enum',
+    enum: MediaCategory,
+    nullable: true,
+    default: null
+  })
+  category: MediaCategory | null;
 
   @CreateDateColumn()
   createdAt: Date;
