@@ -1,10 +1,12 @@
 import api from './api';
+import { MediaCategory } from '@/types/MediaCategory';
 
 export interface Prompt {
   id: number;
   title: string;
   prompt: string;
   person_count: number;
+  category: MediaCategory | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -13,14 +15,16 @@ export interface CreatePromptData {
   title: string;
   prompt: string;
   person_count: number;
+  category?: MediaCategory | null;
 }
 
 export interface UpdatePromptData extends Partial<CreatePromptData> {}
 
 export const promptService = {
-  // Get all prompts
-  getAll: async (): Promise<Prompt[]> => {
-    const response = await api.get('/prompts');
+  // Get all prompts (optionally filtered by category)
+  getAll: async (category?: MediaCategory | null): Promise<Prompt[]> => {
+    const params = category ? { category } : {};
+    const response = await api.get('/prompts', { params });
     return response.data;
   },
 

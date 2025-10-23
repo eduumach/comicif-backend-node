@@ -6,18 +6,22 @@ import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { usePrompts } from "@/hooks/usePrompts"
 import type { Prompt, CreatePromptData } from "@/services/prompts"
-import { Plus, Edit, Trash2, Loader2 } from "lucide-react"
+import { MediaCategory, MediaCategoryLabels } from "@/types/MediaCategory"
+import { Plus, Edit, Trash2, Loader2, Filter } from "lucide-react"
 
 export default function Prompts() {
-  const { prompts, loading, error, createPrompt, updatePrompt, deletePrompt } = usePrompts()
+  const [categoryFilter, setCategoryFilter] = useState<MediaCategory | null>(null)
+  const { prompts, loading, error, createPrompt, updatePrompt, deletePrompt } = usePrompts(categoryFilter)
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [editingPrompt, setEditingPrompt] = useState<Prompt | null>(null)
   const [formData, setFormData] = useState<CreatePromptData>({
     title: '',
     prompt: '',
-    person_count: 0
+    person_count: 0,
+    category: null
   })
   const [submitting, setSubmitting] = useState(false)
 
@@ -34,7 +38,7 @@ export default function Prompts() {
         await createPrompt(formData)
         setIsCreateOpen(false)
       }
-      setFormData({ title: '', prompt: '', person_count: 0 })
+      setFormData({ title: '', prompt: '', person_count: 0, category: null })
     } catch (err) {
       // Error is handled by hook
       console.error('Submit error:', err)
@@ -48,7 +52,8 @@ export default function Prompts() {
     setFormData({
       title: prompt.title,
       prompt: prompt.prompt,
-      person_count: prompt.person_count
+      person_count: prompt.person_count,
+      category: prompt.category
     })
     setEditingPrompt(prompt)
   }
@@ -62,7 +67,7 @@ export default function Prompts() {
   }
 
   const resetForm = () => {
-    setFormData({ title: '', prompt: '', person_count: 0 })
+    setFormData({ title: '', prompt: '', person_count: 0, category: null })
     setEditingPrompt(null)
     setIsCreateOpen(false)
   }
@@ -133,6 +138,25 @@ export default function Prompts() {
                     className="min-h-[44px]"
                   />
                 </div>
+                <div>
+                  <label className="text-sm font-medium">Categoria</label>
+                  <Select
+                    value={formData.category || 'none'}
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, category: value === 'none' ? null : value as MediaCategory }))}
+                  >
+                    <SelectTrigger className="min-h-[44px]">
+                      <SelectValue placeholder="Selecione uma categoria" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Sem categoria</SelectItem>
+                      {Object.entries(MediaCategoryLabels).map(([key, label]) => (
+                        <SelectItem key={key} value={key}>
+                          {label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <DialogFooter className="mt-6 flex-col sm:flex-row gap-2">
                 <Button type="button" variant="outline" onClick={resetForm} className="w-full sm:w-auto min-h-[44px]">
@@ -147,6 +171,34 @@ export default function Prompts() {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Category Filter */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-muted-foreground" />
+              <label className="text-sm font-medium">Filtrar por Categoria:</label>
+            </div>
+            <Select
+              value={categoryFilter || 'all'}
+              onValueChange={(value) => setCategoryFilter(value === 'all' ? null : value as MediaCategory)}
+            >
+              <SelectTrigger className="w-full sm:w-[200px]">
+                <SelectValue placeholder="Todas as categorias" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas as categorias</SelectItem>
+                {Object.entries(MediaCategoryLabels).map(([key, label]) => (
+                  <SelectItem key={key} value={key}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
 
       {error && (
         <Card className="border-destructive">
@@ -178,6 +230,7 @@ export default function Prompts() {
                     <TableRow>
                       <TableHead>Title</TableHead>
                       <TableHead>Prompt</TableHead>
+                      <TableHead>Categoria</TableHead>
                       <TableHead>People</TableHead>
                       <TableHead>Created</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
@@ -191,6 +244,9 @@ export default function Prompts() {
                           <div className="max-h-20 overflow-y-auto text-sm">
                             {prompt.prompt}
                           </div>
+                        </TableCell>
+                        <TableCell>
+                          {prompt.category ? MediaCategoryLabels[prompt.category] : '-'}
                         </TableCell>
                         <TableCell>{prompt.person_count}</TableCell>
                         <TableCell>
@@ -248,6 +304,11 @@ export default function Prompts() {
                           <div className="flex-1 min-w-0">
                             <h3 className="font-medium text-base truncate">{prompt.title}</h3>
                             <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
+                              {prompt.category && (
+                                <span className="bg-primary/10 text-primary px-2 py-0.5 rounded">
+                                  {MediaCategoryLabels[prompt.category]}
+                                </span>
+                              )}
                               <span>People: {prompt.person_count}</span>
                               <span>{new Date(prompt.createdAt).toLocaleDateString()}</span>
                             </div>
@@ -342,6 +403,25 @@ export default function Prompts() {
                   placeholder="Number of people in the image"
                   className="min-h-[44px]"
                 />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Categoria</label>
+                <Select
+                  value={formData.category || 'none'}
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, category: value === 'none' ? null : value as MediaCategory }))}
+                >
+                  <SelectTrigger className="min-h-[44px]">
+                    <SelectValue placeholder="Selecione uma categoria" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Sem categoria</SelectItem>
+                    {Object.entries(MediaCategoryLabels).map(([key, label]) => (
+                      <SelectItem key={key} value={key}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <DialogFooter className="mt-6 flex-col sm:flex-row gap-2">

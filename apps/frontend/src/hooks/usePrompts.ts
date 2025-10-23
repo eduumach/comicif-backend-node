@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { promptService, type Prompt, type CreatePromptData, type UpdatePromptData } from '@/services/prompts'
+import { MediaCategory } from '@/types/MediaCategory'
 
-export function usePrompts() {
+export function usePrompts(categoryFilter?: MediaCategory | null) {
   const [prompts, setPrompts] = useState<Prompt[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -10,7 +11,7 @@ export function usePrompts() {
     try {
       setLoading(true)
       setError(null)
-      const data = await promptService.getAll()
+      const data = await promptService.getAll(categoryFilter)
       setPrompts(data)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch prompts')
@@ -59,7 +60,7 @@ export function usePrompts() {
 
   useEffect(() => {
     fetchPrompts()
-  }, [])
+  }, [categoryFilter])
 
   return {
     prompts,
