@@ -142,7 +142,7 @@ export default function Prompts() {
                   <label className="text-sm font-medium">Categoria</label>
                   <Select
                     value={formData.category || 'none'}
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, category: value === 'none' ? null : value as MediaCategory }))}
+                    onValueChange={(value: string) => setFormData(prev => ({ ...prev, category: value === 'none' ? null : value as MediaCategory }))}
                   >
                     <SelectTrigger className="min-h-[44px]">
                       <SelectValue placeholder="Selecione uma categoria" />
@@ -182,7 +182,7 @@ export default function Prompts() {
             </div>
             <Select
               value={categoryFilter || 'all'}
-              onValueChange={(value) => setCategoryFilter(value === 'all' ? null : value as MediaCategory)}
+              onValueChange={(value: string) => setCategoryFilter(value === 'all' ? null : value as MediaCategory)}
             >
               <SelectTrigger className="w-full sm:w-[200px]">
                 <SelectValue placeholder="Todas as categorias" />
@@ -408,7 +408,7 @@ export default function Prompts() {
                 <label className="text-sm font-medium">Categoria</label>
                 <Select
                   value={formData.category || 'none'}
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, category: value === 'none' ? null : value as MediaCategory }))}
+                  onValueChange={(value: string) => setFormData(prev => ({ ...prev, category: value === 'none' ? null : value as MediaCategory }))}
                 >
                   <SelectTrigger className="min-h-[44px]">
                     <SelectValue placeholder="Selecione uma categoria" />

@@ -1,16 +1,18 @@
 /**
  * Media category types for prompts
  */
-export enum MediaCategory {
-  ANIME = 'anime',
-  MOVIES = 'movies',
-  SERIES = 'series',
-  GAMES = 'games',
-  COMICS = 'comics',
-  CARTOONS = 'cartoons',
-  BOOKS = 'books',
-  OTHER = 'other'
-}
+export const MediaCategory = {
+  ANIME: 'anime',
+  MOVIES: 'movies',
+  SERIES: 'series',
+  GAMES: 'games',
+  COMICS: 'comics',
+  CARTOONS: 'cartoons',
+  BOOKS: 'books',
+  OTHER: 'other'
+} as const;
+
+export type MediaCategory = typeof MediaCategory[keyof typeof MediaCategory];
 
 /**
  * Human-readable labels for media categories
