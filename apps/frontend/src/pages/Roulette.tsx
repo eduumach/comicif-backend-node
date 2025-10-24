@@ -17,9 +17,13 @@ export default function Roulette() {
   const [currentResult, setCurrentResult] = useState<RouletteResult | null>(null);
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
   const [drawnPrompt, setDrawnPrompt] = useState<Prompt | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [categoryPrompts, setCategoryPrompts] = useState<Prompt[]>([]);
+  const [drawnCategoryPrompt, setDrawnCategoryPrompt] = useState<Prompt | null>(null);
   const [loading, setLoading] = useState(true);
   const [spinning, setSpinning] = useState(false);
   const [spinningPrompt, setSpinningPrompt] = useState(false);
+  const [spinningCategoryPrompt, setSpinningCategoryPrompt] = useState(false);
   const [drawingPrompt, setDrawingPrompt] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -138,6 +142,37 @@ export default function Roulette() {
     }
   };
 
+  const handleCategoryChange = async (category: string) => {
+    setSelectedCategory(category);
+    setDrawnCategoryPrompt(null);
+    
+    // Filtrar prompts da categoria selecionada
+    const filtered = prompts.filter(p => p.category === category);
+    setCategoryPrompts(filtered);
+  };
+
+  const handleSpinCategoryPrompt = async () => {
+    if (!selectedCategory || categoryPrompts.length === 0) return;
+
+    try {
+      setSpinningCategoryPrompt(true);
+      setError(null);
+
+      // Chamar API para sortear um prompt da categoria selecionada
+      const result = await rouletteService.drawPrompt(selectedCategory as any);
+
+      // Aguardar a animação completar (4 segundos para a roleta girar)
+      setTimeout(() => {
+        setDrawnCategoryPrompt(result);
+        setSpinningCategoryPrompt(false);
+      }, 4000);
+    } catch (err) {
+      console.error('Error spinning category prompt:', err);
+      setError('Erro ao sortear prompt da categoria');
+      setSpinningCategoryPrompt(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="space-y-2">
@@ -156,9 +191,11 @@ export default function Roulette() {
       )}
 
       <Tabs defaultValue="categories" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="categories">Roleta de Categorias</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="prompts">Roleta de Prompts</TabsTrigger>
+          <TabsTrigger value="category-prompt">Categoria → Prompt</TabsTrigger>
+          <TabsTrigger value="categories">Roleta de Categorias</TabsTrigger>
+
         </TabsList>
 
         {/* Tab: Roleta de Categorias */}
@@ -399,6 +436,141 @@ export default function Roulette() {
                 </CardContent>
               </Card>
             </>
+          )}
+        </TabsContent>
+
+        {/* Tab: Categoria → Prompt */}
+        <TabsContent value="category-prompt" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Sortear Prompt por Categoria</CardTitle>
+              <CardDescription>
+                Selecione uma categoria e sorteie um prompt dessa categoria com a roleta
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Seletor de Categoria */}
+              <div className="space-y-3">
+                <label className="text-sm font-medium">Categoria</label>
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => handleCategoryChange(e.target.value)}
+                  className="w-full p-3 border rounded-lg bg-background"
+                >
+                  <option value="">Selecione uma categoria...</option>
+                  {categories.map((category) => (
+                    <option key={category.category} value={category.category}>
+                      {category.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Info sobre a categoria selecionada */}
+              {selectedCategory && categoryPrompts.length > 0 && (
+                <div className="bg-muted rounded-lg p-4 border">
+                  <p className="text-sm text-muted-foreground">
+                    <span className="font-semibold">{categoryPrompts.length}</span> prompts disponíveis na categoria{' '}
+                    <span className="font-semibold">
+                      {categories.find(c => c.category === selectedCategory)?.label}
+                    </span>
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Roleta de Prompts da Categoria */}
+          {selectedCategory && categoryPrompts.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Gire a Roleta</CardTitle>
+                <CardDescription>
+                  {categoryPrompts.length} prompts da categoria {categories.find(c => c.category === selectedCategory)?.label}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex justify-center py-8">
+                  <RoulettePromptWheel
+                    prompts={categoryPrompts}
+                    selectedPrompt={drawnCategoryPrompt}
+                    onSpin={handleSpinCategoryPrompt}
+                    spinning={spinningCategoryPrompt}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Prompt Sorteado */}
+          {drawnCategoryPrompt && !spinningCategoryPrompt && (
+            <Card className="border-green-500">
+              <CardHeader>
+                <CardTitle>Prompt Sorteado</CardTitle>
+                <CardDescription>
+                  Prompt sorteado da categoria {categories.find(c => c.category === selectedCategory)?.label}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                  <div>
+                    <p className="font-semibold text-lg text-green-900">
+                      {drawnCategoryPrompt.title}
+                    </p>
+                    {drawnCategoryPrompt.person_count !== null && drawnCategoryPrompt.person_count !== undefined && (
+                      <p className="text-xs text-green-600 mt-2">
+                        Pessoas: {drawnCategoryPrompt.person_count}
+                      </p>
+                    )}
+                    {drawnCategoryPrompt.category && (
+                      <p className="text-xs text-green-600 mt-1">
+                        Categoria: {drawnCategoryPrompt.category}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button
+                    onClick={() => navigate('/admin/generate', { state: { selectedPrompt: drawnCategoryPrompt } })}
+                    className="flex-1 min-h-[48px]"
+                  >
+                    Gerar com Este Prompt
+                  </Button>
+                  <Button
+                    onClick={handleSpinCategoryPrompt}
+                    disabled={spinningCategoryPrompt}
+                    variant="outline"
+                    className="flex-1 min-h-[48px]"
+                  >
+                    <Shuffle className="h-4 w-4 mr-2" />
+                    Sortear Outro
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {selectedCategory && categoryPrompts.length === 0 && (
+            <Card>
+              <CardContent className="text-center py-12 px-4">
+                <Dices className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                <p className="text-muted-foreground mb-2">
+                  Nenhum prompt disponível nesta categoria
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
+          {!selectedCategory && (
+            <Card>
+              <CardContent className="text-center py-12 px-4">
+                <Dices className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                <p className="text-muted-foreground mb-2">
+                  Selecione uma categoria para ver a roleta de prompts
+                </p>
+              </CardContent>
+            </Card>
           )}
         </TabsContent>
       </Tabs>

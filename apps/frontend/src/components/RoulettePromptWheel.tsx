@@ -22,8 +22,9 @@ export function RoulettePromptWheel({ prompts, selectedPrompt, onSpin, spinning 
       if (selectedIndex !== -1) {
         // Calcular ângulo para parar no prompt selecionado
         const segmentAngle = 360 / prompts.length;
-        // Ajustar para o centro do segmento e compensar a rotação inicial
-        const targetAngle = -(selectedIndex * segmentAngle) - (segmentAngle / 2);
+        // Ajustar para a diagonal (45 graus) - posição do indicador
+        const diagonalOffset = 45; // Diagonal superior direita
+        const targetAngle = -(selectedIndex * segmentAngle) - (segmentAngle / 2) + diagonalOffset;
 
         // Adicionar rotações extras para efeito visual
         const extraRotations = 360 * 5; // 5 voltas completas
@@ -103,8 +104,8 @@ export function RoulettePromptWheel({ prompts, selectedPrompt, onSpin, spinning 
     <div className="flex flex-col items-center gap-8">
       {/* Container da Roleta */}
       <div className="relative w-96 h-96">
-        {/* Indicador/Seta */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 z-20">
+        {/* Indicador/Seta na diagonal superior direita */}
+        <div className="absolute top-8 right-8 z-20" style={{ transform: 'rotate(45deg)' }}>
           <div className="w-0 h-0 border-l-[20px] border-l-transparent border-r-[20px] border-r-transparent border-t-[40px] border-t-red-600 drop-shadow-lg" />
         </div>
 
