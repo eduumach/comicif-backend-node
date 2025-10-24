@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Link, useLocation } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
+import ThemeToggle from "@/components/ThemeToggle"
 import { Home, ImageIcon, Palette, Sparkles, LogIn, LogOut, Menu, X, Dices } from "lucide-react"
 
 export default function Navigation() {
@@ -89,7 +90,8 @@ export default function Navigation() {
               </>
             )}
 
-            <div className="border-l pl-4">
+            <div className="border-l pl-4 flex items-center space-x-2">
+              <ThemeToggle />
               {isAuthenticated ? (
                 <Button
                   variant="ghost"
@@ -115,19 +117,22 @@ export default function Navigation() {
           </div>
 
           {/* Mobile Menu Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="md:hidden h-11 w-11 p-0"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-          >
-            {mobileMenuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
-          </Button>
+          <div className="md:hidden flex items-center space-x-2">
+            <ThemeToggle />
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-11 w-11 p-0"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            >
+              {mobileMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </Button>
+          </div>
         </div>
 
         {/* Mobile Navigation Menu */}
