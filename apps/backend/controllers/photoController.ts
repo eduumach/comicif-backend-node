@@ -78,32 +78,58 @@ export const listPhotos = async (req: Request, res: Response): Promise<void> => 
   try {
     const photoRepository = databaseService.getDataSource().getRepository(Photo);
 
-    const photos = await photoRepository.find({
-      relations: ['prompt'],
-      order: {
-        createdAt: 'DESC'
-      }
-    });
+    // Parse query parameters
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+    const type = req.query.type as string; // 'generated', 'original', or undefined for all
+    const category = req.query.category as string; // category filter for prompts
 
-    // Filter out photos with null path
-    const validPhotos = photos.filter(photo => photo.path !== null && photo.path !== undefined);
+    const skip = (page - 1) * limit;
 
-    const links = await Promise.all(validPhotos.map(photo => minioService.getFileUrl(photo.path)));
+    // Build query
+    const queryBuilder = photoRepository
+      .createQueryBuilder('photo')
+      .leftJoinAndSelect('photo.prompt', 'prompt')
+      .orderBy('photo.createdAt', 'DESC')
+      .skip(skip)
+      .take(limit);
+
+    // Apply filters
+    if (type === 'generated' || type === 'original') {
+      queryBuilder.andWhere('photo.type = :type', { type });
+    }
+
+    if (category) {
+      queryBuilder.andWhere('prompt.category = :category', { category });
+    }
+
+    // Filter out null paths
+    queryBuilder.andWhere('photo.path IS NOT NULL');
+
+    const [photos, totalCount] = await queryBuilder.getManyAndCount();
+
+    const links = await Promise.all(photos.map(photo => minioService.getFileUrl(photo.path)));
 
     res.json({
-      photos: validPhotos.map((photo, index) => ({
+      photos: photos.map((photo, index) => ({
         id: photo.id,
         path: links[index],
         likes: photo.likes,
+        type: photo.type,
         createdAt: photo.createdAt,
         updatedAt: photo.updatedAt,
         prompt: photo.prompt ? {
           id: photo.prompt.id,
           title: photo.prompt.title,
-          prompt: photo.prompt.prompt
+          prompt: photo.prompt.prompt,
+          category: photo.prompt.category
         } : null
       })),
-      count: validPhotos.length
+      count: photos.length,
+      totalCount,
+      page,
+      totalPages: Math.ceil(totalCount / limit),
+      hasMore: page * limit < totalCount
     });
 
   } catch (error) {

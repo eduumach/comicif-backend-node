@@ -1,15 +1,53 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { usePhotos } from "@/hooks/usePhotos"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useInfinitePhotos } from "@/hooks/useInfinitePhotos"
 import type { Photo } from "@/services/photos"
-import { Heart, Loader2, Calendar, Download } from "lucide-react"
+import { MediaCategory, MediaCategoryLabels } from "@/types/MediaCategory"
+import { Heart, Loader2, Calendar, Download, Filter } from "lucide-react"
 
 export default function Gallery() {
-  const { photos, loading, error, likePhoto } = usePhotos()
+  const [typeFilter, setTypeFilter] = useState<'all' | 'generated' | 'original'>('all')
+  const [categoryFilter, setCategoryFilter] = useState<string>('all')
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null)
   const [likingPhoto, setLikingPhoto] = useState<number | null>(null)
+  
+  const { photos, loading, loadingMore, error, hasMore, totalCount, loadMore, likePhoto } = useInfinitePhotos({
+    type: typeFilter,
+    category: categoryFilter === 'all' ? undefined : categoryFilter,
+    limit: 20
+  })
+
+  // Infinite scroll observer
+  const observerTarget = useRef<HTMLDivElement>(null)
+
+  const handleObserver = useCallback((entries: IntersectionObserverEntry[]) => {
+    const [target] = entries
+    if (target.isIntersecting && hasMore && !loadingMore) {
+      loadMore()
+    }
+  }, [hasMore, loadingMore, loadMore])
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(handleObserver, {
+      root: null,
+      rootMargin: '100px',
+      threshold: 0.1
+    })
+
+    const currentTarget = observerTarget.current
+    if (currentTarget) {
+      observer.observe(currentTarget)
+    }
+
+    return () => {
+      if (currentTarget) {
+        observer.unobserve(currentTarget)
+      }
+    }
+  }, [handleObserver])
 
   // Sincroniza selectedPhoto quando photos mudar (para atualizar likes em tempo real)
   useEffect(() => {
@@ -49,14 +87,6 @@ export default function Gallery() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    )
-  }
-
   return (
     <div className="space-y-4 sm:space-y-6 pb-4">
       <div className="space-y-2 sm:space-y-3">
@@ -68,6 +98,64 @@ export default function Gallery() {
         </p>
       </div>
 
+      {/* Filters */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <label className="text-sm font-medium mb-2 block">Tipo de Foto</label>
+              <Select value={typeFilter} onValueChange={(value) => setTypeFilter(value as any)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Todas as fotos" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas as fotos</SelectItem>
+                  <SelectItem value="generated">Com IA</SelectItem>
+                  <SelectItem value="original">Sem IA (Originais)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="flex-1">
+              <label className="text-sm font-medium mb-2 block">Categoria</label>
+              <Select value={categoryFilter || "all"} onValueChange={(value) => setCategoryFilter(value === "all" ? "" : value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Todas as categorias" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas as categorias</SelectItem>
+                  {Object.entries(MediaCategoryLabels).map(([key, label]) => (
+                    <SelectItem key={key} value={MediaCategory[key as keyof typeof MediaCategory]}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex items-end">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setTypeFilter('all')
+                  setCategoryFilter('all')
+                }}
+                className="w-full sm:w-auto"
+              >
+                <Filter className="h-4 w-4 mr-2" />
+                Limpar Filtros
+              </Button>
+            </div>
+          </div>
+          
+          {totalCount > 0 && (
+            <p className="text-sm text-muted-foreground mt-4">
+              {totalCount} {totalCount === 1 ? 'foto encontrada' : 'fotos encontradas'}
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
       {error && (
         <Card className="border-destructive">
           <CardContent className="pt-6">
@@ -76,16 +164,25 @@ export default function Gallery() {
         </Card>
       )}
 
-      {photos.length === 0 ? (
+      {loading && photos.length === 0 ? (
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      ) : photos.length === 0 ? (
         <Card>
           <CardContent className="text-center py-12">
-            <p className="text-muted-foreground mb-2">Nenhuma imagem gerada ainda</p>
-            <p className="text-sm text-muted-foreground">Gere sua primeira imagem para vê-la aqui</p>
+            <p className="text-muted-foreground mb-2">Nenhuma imagem encontrada</p>
+            <p className="text-sm text-muted-foreground">
+              {typeFilter !== 'all' || categoryFilter !== 'all'
+                ? 'Tente ajustar os filtros para ver mais resultados' 
+                : 'Gere sua primeira imagem para vê-la aqui'}
+            </p>
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-2 sm:gap-3 auto-rows-[200px] sm:auto-rows-[240px] grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" style={{ gridAutoFlow: 'dense' }}>
-          {photos.map((photo, index) => {
+        <>
+          <div className="grid gap-2 sm:gap-3 auto-rows-[200px] sm:auto-rows-[240px] grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" style={{ gridAutoFlow: 'dense' }}>
+            {photos.map((photo, index) => {
             // Padrão mais controlado para evitar buracos
             const isLarge = index % 10 === 0
             const isTall = index % 6 === 2 && !isLarge
@@ -172,6 +269,22 @@ export default function Gallery() {
             )
           })}
         </div>
+
+        {/* Infinite Scroll Loading Indicator */}
+        <div ref={observerTarget} className="flex items-center justify-center py-8">
+          {loadingMore && (
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-6 w-6 animate-spin" />
+              <span className="text-sm text-muted-foreground">Carregando mais fotos...</span>
+            </div>
+          )}
+          {!hasMore && photos.length > 0 && (
+            <p className="text-sm text-muted-foreground">
+              Você chegou ao fim da galeria 🎉
+            </p>
+          )}
+        </div>
+      </>
       )}
 
       {/* Photo Detail Dialog - Mobile Optimized */}

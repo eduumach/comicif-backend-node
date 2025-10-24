@@ -4,18 +4,31 @@ export interface Photo {
   id: number;
   path: string;
   likes: number;
+  type: 'generated' | 'original';
   createdAt: string;
   updatedAt: string;
   prompt: {
     id: number;
     title: string;
     prompt: string;
+    category?: string;
   } | null;
 }
 
 export interface PhotosResponse {
   photos: Photo[];
   count: number;
+  totalCount: number;
+  page: number;
+  totalPages: number;
+  hasMore: boolean;
+}
+
+export interface PhotoFilters {
+  page?: number;
+  limit?: number;
+  type?: 'generated' | 'original' | 'all';
+  category?: string;
 }
 
 export interface GeneratePhotoData {
@@ -28,9 +41,17 @@ export interface GenerateRandomPhotoData {
 }
 
 export const photoService = {
-  // Get all photos
-  getAll: async (): Promise<PhotosResponse> => {
-    const response = await api.get('/photos');
+  // Get all photos with filters and pagination
+  getAll: async (filters?: PhotoFilters): Promise<PhotosResponse> => {
+    const params = new URLSearchParams();
+    
+    if (filters?.page) params.append('page', filters.page.toString());
+    if (filters?.limit) params.append('limit', filters.limit.toString());
+    if (filters?.type && filters.type !== 'all') params.append('type', filters.type);
+    if (filters?.category) params.append('category', filters.category);
+
+    const url = `/photos${params.toString() ? `?${params.toString()}` : ''}`;
+    const response = await api.get(url);
     return response.data;
   },
 
