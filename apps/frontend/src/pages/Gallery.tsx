@@ -39,7 +39,7 @@ export default function Gallery() {
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
-      link.download = `${photo.prompt.title || 'image'}.png`
+      link.download = `${photo.prompt?.title || 'image'}.png`
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
@@ -108,7 +108,7 @@ export default function Gallery() {
               >
                 <img
                   src={photo.path}
-                  alt={photo.prompt.title}
+                  alt={photo.prompt?.title || 'Photo'}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   onError={(e) => {
                     e.currentTarget.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23f3f4f6"/><text x="50" y="50" text-anchor="middle" dy=".3em" fill="%236b7280">No Image</text></svg>'
@@ -120,7 +120,9 @@ export default function Gallery() {
 
                 {/* Informações da foto */}
                 <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                  <h3 className="font-semibold text-white text-sm sm:text-base mb-2 line-clamp-2">{photo.prompt.title}</h3>
+                  <h3 className="font-semibold text-white text-sm sm:text-base mb-2 line-clamp-2">
+                    {photo.prompt?.title || 'Foto Original'}
+                  </h3>
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center text-xs text-white/80">
                       <Calendar className="h-3 w-3 mr-1" />
@@ -180,7 +182,7 @@ export default function Gallery() {
               {/* Header - Compacto no mobile */}
               <DialogHeader className="px-4 sm:px-6 pt-3 sm:pt-6 pb-2 sm:pb-3 border-b shrink-0">
                 <DialogTitle className="text-base sm:text-xl md:text-2xl font-bold pr-8 line-clamp-2">
-                  {selectedPhoto.prompt.title}
+                  {selectedPhoto.prompt?.title || 'Foto Original'}
                 </DialogTitle>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
                   <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -196,7 +198,7 @@ export default function Gallery() {
               <div className="flex-1 flex items-center justify-center bg-black/5 dark:bg-black/20 p-2 sm:p-6 overflow-hidden min-h-0">
                 <img
                   src={selectedPhoto.path}
-                  alt={selectedPhoto.prompt.title}
+                  alt={selectedPhoto.prompt?.title || 'Photo'}
                   className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
                   onError={(e) => {
                     e.currentTarget.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23f3f4f6"/><text x="50" y="50" text-anchor="middle" dy=".3em" fill="%236b7280">No Image</text></svg>'

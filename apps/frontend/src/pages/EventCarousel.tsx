@@ -183,7 +183,7 @@ export default function EventCarousel() {
       <div className="relative w-full h-full flex items-center justify-center">
         <img
           src={currentPhoto.path}
-          alt={currentPhoto.prompt.title}
+          alt={currentPhoto.prompt?.title || 'Photo'}
           className={`max-w-full max-h-full object-contain transition-opacity duration-300 ${
             isTransitioning ? 'opacity-0' : 'opacity-100'
           }`}
@@ -230,7 +230,7 @@ export default function EventCarousel() {
 
         {/* Info Panel */}
         <div className="absolute bottom-4 right-4 bg-black/70 text-white p-4 rounded-lg max-w-sm">
-          <h3 className="font-medium mb-1">{currentPhoto.prompt.title}</h3>
+          <h3 className="font-medium mb-1">{currentPhoto.prompt?.title || 'Foto Original'}</h3>
           <p className="text-sm opacity-80">{currentIndex + 1} de {photos.length}</p>
           <p className="text-xs opacity-60 mt-1">
             {new Date(currentPhoto.createdAt).toLocaleString('pt-BR')}

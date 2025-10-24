@@ -10,7 +10,7 @@ export interface Photo {
     id: number;
     title: string;
     prompt: string;
-  };
+  } | null;
 }
 
 export interface PhotosResponse {

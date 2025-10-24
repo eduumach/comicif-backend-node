@@ -42,6 +42,7 @@ export const generatePhotoFromPrompt = async (req: Request, res: Response): Prom
     newPhoto.path = fileName;
     newPhoto.prompt = randomPrompt;
     newPhoto.likes = 0;
+    newPhoto.type = 'generated';
 
     const savedPhoto = await photoRepository.save(newPhoto);
     const link = await minioService.getFileUrl(fileName);
@@ -84,22 +85,25 @@ export const listPhotos = async (req: Request, res: Response): Promise<void> => 
       }
     });
 
-    const links = await Promise.all(photos.map(photo => minioService.getFileUrl(photo.path)));
+    // Filter out photos with null path
+    const validPhotos = photos.filter(photo => photo.path !== null && photo.path !== undefined);
+
+    const links = await Promise.all(validPhotos.map(photo => minioService.getFileUrl(photo.path)));
 
     res.json({
-      photos: photos.map((photo, index) => ({
+      photos: validPhotos.map((photo, index) => ({
         id: photo.id,
         path: links[index],
         likes: photo.likes,
         createdAt: photo.createdAt,
         updatedAt: photo.updatedAt,
-        prompt: {
+        prompt: photo.prompt ? {
           id: photo.prompt.id,
           title: photo.prompt.title,
           prompt: photo.prompt.prompt
-        }
+        } : null
       })),
-      count: photos.length
+      count: validPhotos.length
     });
 
   } catch (error) {
@@ -142,11 +146,11 @@ export const likePhoto = async (req: Request, res: Response): Promise<void> => {
       likes: updatedPhoto.likes,
       createdAt: updatedPhoto.createdAt,
       updatedAt: updatedPhoto.updatedAt,
-      prompt: {
+      prompt: updatedPhoto.prompt ? {
         id: updatedPhoto.prompt.id,
         title: updatedPhoto.prompt.title,
         prompt: updatedPhoto.prompt.prompt
-      }
+      } : null
     });
 
   } catch (error) {
@@ -192,6 +196,7 @@ export const generatePhotoFromPromptId = async (req: Request, res: Response): Pr
     newPhoto.path = fileName;
     newPhoto.prompt = prompt;
     newPhoto.likes = 0;
+    newPhoto.type = 'generated';
 
     const savedPhoto = await photoRepository.save(newPhoto);
     const link = await minioService.getFileUrl(fileName);
@@ -254,22 +259,25 @@ export const getPhotosSince = async (req: Request, res: Response): Promise<void>
       }
     });
 
-    const links = await Promise.all(photos.map(photo => minioService.getFileUrl(photo.path)));
+    // Filter out photos with null path
+    const validPhotos = photos.filter(photo => photo.path !== null && photo.path !== undefined);
+
+    const links = await Promise.all(validPhotos.map(photo => minioService.getFileUrl(photo.path)));
 
     res.json({
-      photos: photos.map((photo, index) => ({
+      photos: validPhotos.map((photo, index) => ({
         id: photo.id,
         path: links[index],
         likes: photo.likes,
         createdAt: photo.createdAt,
         updatedAt: photo.updatedAt,
-        prompt: {
+        prompt: photo.prompt ? {
           id: photo.prompt.id,
           title: photo.prompt.title,
           prompt: photo.prompt.prompt
-        }
+        } : null
       })),
-      count: photos.length
+      count: validPhotos.length
     });
 
   } catch (error) {

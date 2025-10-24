@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Link, useLocation } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
 import ThemeToggle from "@/components/ThemeToggle"
-import { Home, ImageIcon, Palette, Sparkles, LogIn, LogOut, Menu, X, Dices } from "lucide-react"
+import { Home, ImageIcon, Palette, Sparkles, LogIn, LogOut, Menu, X, Dices, Camera } from "lucide-react"
 
 export default function Navigation() {
   const location = useLocation()
@@ -66,6 +66,17 @@ export default function Navigation() {
 
             {isAuthenticated && (
               <>
+                <Button
+                  variant={isActive('/original-photos') ? 'default' : 'ghost'}
+                  size="sm"
+                  asChild
+                >
+                  <Link to="/original-photos">
+                    <Camera className="h-4 w-4 mr-2" />
+                    Fotos
+                  </Link>
+                </Button>
+
                 <Button
                   variant={isActive('/admin/prompts') ? 'default' : 'ghost'}
                   size="sm"
@@ -177,6 +188,18 @@ export default function Navigation() {
 
               {isAuthenticated && (
                 <>
+                  <Button
+                    variant={isActive('/original-photos') ? 'default' : 'ghost'}
+                    size="sm"
+                    asChild
+                    className="w-full justify-start h-12 text-base"
+                  >
+                    <Link to="/original-photos" onClick={closeMobileMenu}>
+                      <Camera className="h-5 w-5 mr-3" />
+                      Fotos
+                    </Link>
+                  </Button>
+
                   <Button
                     variant={isActive('/admin/prompts') ? 'default' : 'ghost'}
                     size="sm"

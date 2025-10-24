@@ -78,12 +78,6 @@ export default function Login() {
               )}
             </Button>
           </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-sm text-muted-foreground">
-              Senha padrão: <code className="bg-muted px-2 py-1 rounded text-xs sm:text-sm">admin123</code>
-            </p>
-          </div>
         </CardContent>
       </Card>
     </div>

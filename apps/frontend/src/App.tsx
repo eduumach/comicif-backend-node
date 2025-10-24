@@ -10,6 +10,7 @@ import Generate from "./pages/Generate"
 import Login from "./pages/Login"
 import EventCarousel from "./pages/EventCarousel"
 import Roulette from "./pages/Roulette"
+import OriginalPhotos from "./pages/OriginalPhotos"
 
 function App() {
   return (
@@ -44,6 +45,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Generate />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="original-photos"
+                element={
+                  <ProtectedRoute>
+                    <OriginalPhotos />
                   </ProtectedRoute>
                 }
               />

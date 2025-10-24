@@ -6,11 +6,14 @@ export class Photo {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ type: 'varchar', length: 255 })
+    @Column({ type: 'varchar', length: 1000, nullable: true })
     path: string;
 
     @Column({ type: 'int', nullable: true, default: 0 })
     likes: number;
+
+    @Column({ type: 'varchar', length: 50, default: 'generated' })
+    type: 'generated' | 'original';
 
     @CreateDateColumn()
     createdAt: Date;
@@ -18,6 +21,6 @@ export class Photo {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @ManyToOne(() => Prompt, (prompt) => prompt.photos)
+    @ManyToOne(() => Prompt, (prompt) => prompt.photos, { nullable: true })
     prompt: Prompt;
 }

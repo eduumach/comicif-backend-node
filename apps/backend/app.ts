@@ -10,6 +10,7 @@ import fileRoutes from './routes/fileRoutes';
 import photoRoutes from './routes/photoRoutes';
 import authRoutes from './routes/authRoutes';
 import rouletteRoutes from './routes/rouletteRoutes';
+import originalPhotoRoutes from './routes/originalPhotoRoutes';
 
 dotenv.config();
 
@@ -40,6 +41,7 @@ app.use('/api/prompts', promptRoutes);
 app.use('/api/files', fileRoutes);
 app.use('/api/photos', photoRoutes);
 app.use('/api/roulette', rouletteRoutes);
+app.use('/api/original-photos', originalPhotoRoutes);
 
 // Socket.IO connection handling
 io.on('connection', (socket) => {

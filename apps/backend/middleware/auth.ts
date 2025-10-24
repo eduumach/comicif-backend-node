@@ -1,10 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 
-// Simple token for demonstration - in production, use JWT or proper auth
-const VALID_TOKEN = process.env.AUTH_TOKEN || 'comicif-secret-token-2025';
+// Tokens for different access levels
+const ADMIN_TOKEN = process.env.AUTH_TOKEN || 'comicif-secret-token-2025';
+const ORIGINAL_UPLOAD_TOKEN = process.env.ORIGINAL_UPLOAD_TOKEN || 'comicif-upload-only-token';
 
 interface AuthRequest extends Request {
   isAuthenticated?: boolean;
+  tokenType?: 'admin' | 'upload-only';
 }
 
 export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -23,15 +25,19 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
       ? authHeader.slice(7)
       : authHeader;
 
-    if (token !== VALID_TOKEN) {
+    if (token === ADMIN_TOKEN) {
+      req.isAuthenticated = true;
+      req.tokenType = 'admin';
+      next();
+    } else if (token === ORIGINAL_UPLOAD_TOKEN) {
+      req.isAuthenticated = true;
+      req.tokenType = 'upload-only';
+      next();
+    } else {
       return res.status(401).json({
         error: 'Access denied. Invalid token.'
       });
     }
-
-    // Token is valid, mark request as authenticated
-    req.isAuthenticated = true;
-    next();
 
   } catch (error) {
     console.error('Auth middleware error:', error);
@@ -40,6 +46,19 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
     });
   }
 };
+
+// Middleware que só aceita token admin
+export const adminOnlyMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (req.tokenType !== 'admin') {
+    return res.status(403).json({
+      error: 'Access denied. Admin token required.'
+    });
+  }
+  next();
+};
+
+// Middleware que aceita qualquer token válido (admin ou upload-only)
+export const anyAuthMiddleware = authMiddleware;
 
 // Login endpoint to get token
 export const loginController = (req: Request, res: Response) => {
@@ -63,7 +82,7 @@ export const loginController = (req: Request, res: Response) => {
 
     // Return the token
     res.json({
-      token: VALID_TOKEN,
+      token: ADMIN_TOKEN,
       message: 'Login successful'
     });
 
