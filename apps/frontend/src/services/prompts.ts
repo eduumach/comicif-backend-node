@@ -1,24 +1,8 @@
 import api from './api';
 import { MediaCategory } from '@/types/MediaCategory';
+import type { Prompt, CreatePromptData, UpdatePromptData } from '@/types/prompt';
 
-export interface Prompt {
-  id: number;
-  title: string;
-  prompt: string;
-  person_count: number;
-  category: MediaCategory | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface CreatePromptData {
-  title: string;
-  prompt: string;
-  person_count: number;
-  category?: MediaCategory | null;
-}
-
-export interface UpdatePromptData extends Partial<CreatePromptData> {}
+export type { Prompt, CreatePromptData, UpdatePromptData };
 
 export const promptService = {
   // Get all prompts (optionally filtered by category)

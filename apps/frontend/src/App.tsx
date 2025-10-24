@@ -8,6 +8,7 @@ import Gallery from "./pages/Gallery"
 import Generate from "./pages/Generate"
 import Login from "./pages/Login"
 import EventCarousel from "./pages/EventCarousel"
+import Roulette from "./pages/Roulette"
 
 function App() {
   return (
@@ -20,6 +21,14 @@ function App() {
             <Route index element={<Gallery />} />
             <Route path="gallery" element={<Gallery />} />
             <Route path="home" element={<Home />} />
+            <Route
+              path="roulette"
+              element={
+                <ProtectedRoute>
+                  <Roulette />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="admin/prompts"
               element={

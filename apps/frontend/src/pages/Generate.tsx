@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react"
+import { useLocation } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -7,12 +8,16 @@ import { usePrompts } from "@/hooks/usePrompts"
 import { usePhotos } from "@/hooks/usePhotos"
 import type { Prompt } from "@/services/prompts"
 import type { Photo } from "@/services/photos"
-import { Loader2, Sparkles, Image as ImageIcon, Calendar, User, Upload, Shuffle, Camera } from "lucide-react"
+import type { RouletteResult } from "@/types/roulette"
+import { Loader2, Sparkles, Image as ImageIcon, Calendar, User, Upload, Shuffle, Camera, Dices, X } from "lucide-react"
 
 export default function Generate() {
+  const location = useLocation()
   const { prompts, loading: promptsLoading, error: promptsError } = usePrompts()
   const { generatePhoto, generateRandomPhoto, generating, error: photosError } = usePhotos()
-  const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null)
+  const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(
+    location.state?.selectedPrompt || null
+  )
   const [generatedPhoto, setGeneratedPhoto] = useState<Photo | null>(null)
   const [showResult, setShowResult] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -20,10 +25,18 @@ export default function Generate() {
   const [showCamera, setShowCamera] = useState(false)
   const [capturedImage, setCapturedImage] = useState<string | null>(null)
   const [cameraLoading, setCameraLoading] = useState(false)
+  const [rouletteResult, setRouletteResult] = useState<RouletteResult | null>(
+    location.state?.rouletteResult || null
+  )
   const fileInputRef = useRef<HTMLInputElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
+
+  // Filtrar prompts pela categoria da roleta
+  const filteredPrompts = rouletteResult 
+    ? prompts.filter(p => p.category === rouletteResult.selectedCategory)
+    : prompts
 
   const handleGenerate = async (prompt: Prompt) => {
     if (!selectedFile) {
@@ -198,6 +211,111 @@ export default function Generate() {
         </p>
       </div>
 
+      {/* Roulette Result Card */}
+      {rouletteResult && (
+        <Card className="border-green-500 bg-green-50/50">
+          <CardHeader className="pb-3 sm:pb-4">
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center text-base sm:text-lg">
+                <Dices className="h-5 w-5 mr-2" />
+                Resultado da Roleta
+              </CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setRouletteResult(null)}
+                className="h-8 w-8 p-0"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <CardDescription className="text-sm">
+              Você selecionou este resultado na roleta. Use-o para geração!
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="bg-white border border-green-200 rounded-lg p-4">
+              <p className="font-semibold text-lg text-green-900">
+                {rouletteResult.categoryLabel}
+              </p>
+              <p className="text-xs text-green-600 mt-2">
+                Categoria: {rouletteResult.selectedCategory}
+              </p>
+            </div>
+            <p className="text-xs text-muted-foreground mt-3">
+              Esta categoria será usada para filtrar os prompts disponíveis
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Selected Prompt from Roulette */}
+      {selectedPrompt && !rouletteResult && (
+        <Card className="border-blue-500 bg-blue-50/50">
+          <CardHeader className="pb-3 sm:pb-4">
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center text-base sm:text-lg">
+                <Sparkles className="h-5 w-5 mr-2" />
+                Prompt Selecionado da Roleta
+              </CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedPrompt(null)}
+                className="h-8 w-8 p-0"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <CardDescription className="text-sm">
+              Este prompt foi selecionado na roleta. Faça upload de uma imagem e clique em "Gerar com Este Prompt"!
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="bg-white border border-blue-200 rounded-lg p-4 space-y-3">
+              <div>
+                <p className="font-semibold text-lg text-blue-900">
+                  {selectedPrompt.title}
+                </p>
+                {/* <p className="text-sm text-blue-700 mt-2">
+                  {selectedPrompt.prompt}
+                </p> */}
+              </div>
+              {selectedPrompt.person_count !== null && selectedPrompt.person_count !== undefined && (
+                <div className="flex items-center text-xs text-blue-600">
+                  <User className="h-4 w-4 mr-1" />
+                  Pessoas: {selectedPrompt.person_count}
+                </div>
+              )}
+              {selectedPrompt.category && (
+                <div className="text-xs text-blue-600">
+                  Categoria: {selectedPrompt.category}
+                </div>
+              )}
+            </div>
+            <div className="mt-4">
+              <Button
+                onClick={() => handleGenerate(selectedPrompt)}
+                disabled={!selectedFile || generating}
+                className="w-full min-h-[48px] text-base"
+              >
+                {generating && !isRandomGeneration ? (
+                  <>
+                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                    Gerando com Este Prompt...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-5 w-5 mr-2" />
+                    Gerar com Este Prompt
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* File Upload Section */}
       <Card>
         <CardHeader className="pb-3 sm:pb-6">
@@ -309,9 +427,28 @@ export default function Generate() {
             </Button>
           </CardContent>
         </Card>
+      ) : filteredPrompts.length === 0 ? (
+        <Card className="border-amber-500 bg-amber-50/50">
+          <CardContent className="text-center py-8 sm:py-12 px-4">
+            <Sparkles className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4 text-amber-600" />
+            <p className="text-amber-900 mb-2 text-sm sm:text-base font-medium">
+              Nenhum prompt na categoria "{rouletteResult?.categoryLabel}"
+            </p>
+            <p className="text-xs sm:text-sm text-amber-700 mb-4">
+              Categoria da roleta: {rouletteResult?.selectedCategory}
+            </p>
+            <Button
+              onClick={() => setRouletteResult(null)}
+              variant="outline"
+              className="min-h-[48px] text-base"
+            >
+              Limpar Filtro da Roleta
+            </Button>
+          </CardContent>
+        </Card>
       ) : (
         <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-          {prompts.map((prompt) => (
+          {filteredPrompts.map((prompt) => (
             <Card key={prompt.id} className="group hover:shadow-md transition-shadow">
               <CardHeader className="p-3 sm:p-4 md:p-6">
                 <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">

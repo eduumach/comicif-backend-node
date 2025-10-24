@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Link, useLocation } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
-import { Home, ImageIcon, Palette, Sparkles, LogIn, LogOut, Menu, X } from "lucide-react"
+import { Home, ImageIcon, Palette, Sparkles, LogIn, LogOut, Menu, X, Dices } from "lucide-react"
 
 export default function Navigation() {
   const location = useLocation()
@@ -49,6 +49,17 @@ export default function Navigation() {
               <Link to="/home">
                 <Home className="h-4 w-4 mr-2" />
                 About
+              </Link>
+            </Button>
+
+            <Button
+              variant={isActive('/roulette') ? 'default' : 'ghost'}
+              size="sm"
+              asChild
+            >
+              <Link to="/roulette">
+                <Dices className="h-4 w-4 mr-2" />
+                Roulette
               </Link>
             </Button>
 
@@ -144,6 +155,18 @@ export default function Navigation() {
                 <Link to="/home" onClick={closeMobileMenu}>
                   <Home className="h-5 w-5 mr-3" />
                   About
+                </Link>
+              </Button>
+
+              <Button
+                variant={isActive('/roulette') ? 'default' : 'ghost'}
+                size="sm"
+                asChild
+                className="w-full justify-start h-12 text-base"
+              >
+                <Link to="/roulette" onClick={closeMobileMenu}>
+                  <Dices className="h-5 w-5 mr-3" />
+                  Roulette
                 </Link>
               </Button>
 

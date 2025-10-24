@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm';
 import { Prompt } from '../entities/Prompt';
 import { Photo } from '../entities/Photo';
+import { RouletteResult } from '../entities/RouletteResult';
 
 export class DatabaseService {
   private static instance: DatabaseService;
@@ -18,7 +19,8 @@ export class DatabaseService {
       logging: false,
       entities: [
         Prompt,
-        Photo
+        Photo,
+        RouletteResult
       ],
       migrations: [],
       subscribers: [],
