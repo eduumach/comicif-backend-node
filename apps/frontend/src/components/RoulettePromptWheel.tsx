@@ -12,7 +12,7 @@ interface RoulettePromptWheelProps {
 
 export function RoulettePromptWheel({ prompts, selectedPrompt, onSpin, spinning }: RoulettePromptWheelProps) {
   const [rotation, setRotation] = useState(0);
-  const wheelRef = useRef<HTMLDivElement>(null);
+  const wheelRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
     if (spinning && selectedPrompt) {
@@ -22,36 +22,82 @@ export function RoulettePromptWheel({ prompts, selectedPrompt, onSpin, spinning 
       if (selectedIndex !== -1) {
         // Calcular ângulo para parar no prompt selecionado
         const segmentAngle = 360 / prompts.length;
-        const targetAngle = -(selectedIndex * segmentAngle) + (segmentAngle / 2);
+        // Ajustar para o centro do segmento e compensar a rotação inicial
+        const targetAngle = -(selectedIndex * segmentAngle) - (segmentAngle / 2);
 
         // Adicionar rotações extras para efeito visual
         const extraRotations = 360 * 5; // 5 voltas completas
-        const finalRotation = rotation + extraRotations + targetAngle;
+        const finalRotation = extraRotations + targetAngle;
 
         setRotation(finalRotation);
       }
     }
-  }, [spinning, selectedPrompt, prompts]);
+  }, [spinning, selectedPrompt, prompts, rotation]);
 
   const getColors = () => {
-    const colors = [
-      'bg-red-500',
-      'bg-blue-500',
-      'bg-green-500',
-      'bg-yellow-500',
-      'bg-purple-500',
-      'bg-pink-500',
-      'bg-indigo-500',
-      'bg-orange-500',
-      'bg-cyan-500',
-      'bg-teal-500',
-      'bg-lime-500',
-      'bg-amber-500',
+    return [
+      '#ef4444', // red-500
+      '#3b82f6', // blue-500
+      '#22c55e', // green-500
+      '#eab308', // yellow-500
+      '#a855f7', // purple-500
+      '#ec4899', // pink-500
+      '#6366f1', // indigo-500
+      '#f97316', // orange-500
+      '#06b6d4', // cyan-500
+      '#14b8a6', // teal-500
+      '#84cc16', // lime-500
+      '#f59e0b', // amber-500
     ];
-    return colors;
   };
 
   const colors = getColors();
+  
+  const createWheelSegments = () => {
+    const segments = [];
+    const centerX = 192; // w-96 = 384px / 2
+    const centerY = 192;
+    const radius = 192;
+    const segmentAngle = (2 * Math.PI) / prompts.length;
+
+    for (let i = 0; i < prompts.length; i++) {
+      const startAngle = i * segmentAngle - Math.PI / 2;
+      const endAngle = (i + 1) * segmentAngle - Math.PI / 2;
+      
+      const x1 = centerX + radius * Math.cos(startAngle);
+      const y1 = centerY + radius * Math.sin(startAngle);
+      const x2 = centerX + radius * Math.cos(endAngle);
+      const y2 = centerY + radius * Math.sin(endAngle);
+      
+      const largeArcFlag = segmentAngle > Math.PI ? 1 : 0;
+      
+      const pathData = [
+        `M ${centerX} ${centerY}`,
+        `L ${x1} ${y1}`,
+        `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}`,
+        'Z'
+      ].join(' ');
+      
+      // Calcular posição do texto
+      const textAngle = startAngle + segmentAngle / 2;
+      const textRadius = radius * 0.65;
+      const textX = centerX + textRadius * Math.cos(textAngle);
+      const textY = centerY + textRadius * Math.sin(textAngle);
+      
+      segments.push({
+        path: pathData,
+        color: colors[i % colors.length],
+        label: prompts[i].title,
+        textX,
+        textY,
+        textAngle: (textAngle * 180) / Math.PI + 90,
+      });
+    }
+    
+    return segments;
+  };
+
+  const segments = createWheelSegments();
 
   return (
     <div className="flex flex-col items-center gap-8">
@@ -62,47 +108,68 @@ export function RoulettePromptWheel({ prompts, selectedPrompt, onSpin, spinning 
           <div className="w-0 h-0 border-l-[20px] border-l-transparent border-r-[20px] border-r-transparent border-t-[40px] border-t-red-600 drop-shadow-lg" />
         </div>
 
-        {/* Roda */}
-        <div
-          ref={wheelRef}
-          className="relative w-full h-full rounded-full shadow-2xl overflow-hidden border-8 border-gray-800"
-          style={{
-            transform: `rotate(${rotation}deg)`,
-            transition: spinning ? 'transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)' : 'none',
-          }}
-        >
-          {prompts.map((prompt, index) => {
-            const segmentAngle = 360 / prompts.length;
-            const rotation = index * segmentAngle;
-            const color = colors[index % colors.length];
-
-            return (
-              <div
-                key={prompt.id}
-                className={`absolute w-full h-full ${color}`}
-                style={{
-                  transformOrigin: 'center',
-                  transform: `rotate(${rotation}deg)`,
-                  clipPath: `polygon(50% 50%, 50% 0%, ${50 + Math.tan((Math.PI * segmentAngle) / 360) * 50}% 0%)`,
-                }}
-              >
-                <div
-                  className="absolute top-8 left-1/2 -translate-x-1/2 text-white font-bold text-center px-2"
-                  style={{
-                    transform: `rotate(${segmentAngle / 2}deg)`,
-                    maxWidth: '120px',
+        {/* Roda usando SVG */}
+        <div className="relative w-full h-full">
+          <svg
+            ref={wheelRef}
+            viewBox="0 0 384 384"
+            className="w-full h-full drop-shadow-2xl"
+            style={{
+              transform: `rotate(${rotation}deg)`,
+              transition: spinning ? 'transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)' : 'none',
+            }}
+          >
+            {/* Borda externa */}
+            <circle
+              cx="192"
+              cy="192"
+              r="192"
+              fill="none"
+              stroke="#1f2937"
+              strokeWidth="8"
+            />
+            
+            {/* Segmentos */}
+            {segments.map((segment, index) => (
+              <g key={index}>
+                <path
+                  d={segment.path}
+                  fill={segment.color}
+                  stroke="#ffffff"
+                  strokeWidth="2"
+                />
+                <text
+                  x={segment.textX}
+                  y={segment.textY}
+                  fill="white"
+                  fontSize="12"
+                  fontWeight="bold"
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  transform={`rotate(${segment.textAngle}, ${segment.textX}, ${segment.textY})`}
+                  style={{ 
+                    textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                    pointerEvents: 'none',
                   }}
                 >
-                  <span className="text-xs drop-shadow-md line-clamp-2">
-                    {prompt.title}
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-
-          {/* Centro da roda */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gray-800 rounded-full shadow-lg flex items-center justify-center z-10">
+                  {segment.label.length > 10 ? segment.label.substring(0, 10) + '...' : segment.label}
+                </text>
+              </g>
+            ))}
+            
+            {/* Centro da roda */}
+            <circle
+              cx="192"
+              cy="192"
+              r="40"
+              fill="#1f2937"
+              stroke="#ffffff"
+              strokeWidth="3"
+            />
+          </svg>
+          
+          {/* Ícone no centro */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
             <Dices className="text-white h-8 w-8" />
           </div>
         </div>
