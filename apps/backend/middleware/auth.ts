@@ -67,6 +67,7 @@ export const loginController = (req: Request, res: Response) => {
 
     // Simple password check - in production, use proper user auth
     const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+    const UPLOAD_PASSWORD = process.env.ORIGINAL_UPLOAD_TOKEN || 'comicif-upload-only-token';
 
     if (!password) {
       return res.status(400).json({
@@ -74,16 +75,27 @@ export const loginController = (req: Request, res: Response) => {
       });
     }
 
-    if (password !== ADMIN_PASSWORD) {
-      return res.status(401).json({
-        error: 'Invalid password.'
+    // Check if it's admin password
+    if (password === ADMIN_PASSWORD) {
+      return res.json({
+        token: ADMIN_TOKEN,
+        tokenType: 'admin',
+        message: 'Login successful'
       });
     }
 
-    // Return the token
-    res.json({
-      token: ADMIN_TOKEN,
-      message: 'Login successful'
+    // Check if it's upload-only password
+    if (password === UPLOAD_PASSWORD) {
+      return res.json({
+        token: ORIGINAL_UPLOAD_TOKEN,
+        tokenType: 'upload-only',
+        message: 'Login successful (upload-only access)'
+      });
+    }
+
+    // Invalid password
+    return res.status(401).json({
+      error: 'Invalid password.'
     });
 
   } catch (error) {

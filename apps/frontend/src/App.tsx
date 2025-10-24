@@ -27,7 +27,7 @@ function App() {
               <Route
                 path="roulette"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requireAdmin>
                     <Roulette />
                   </ProtectedRoute>
                 }
@@ -35,7 +35,7 @@ function App() {
               <Route
                 path="admin/prompts"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requireAdmin>
                     <Prompts />
                   </ProtectedRoute>
                 }
@@ -43,7 +43,7 @@ function App() {
               <Route
                 path="admin/generate"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requireAdmin>
                     <Generate />
                   </ProtectedRoute>
                 }

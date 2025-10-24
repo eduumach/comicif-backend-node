@@ -7,7 +7,7 @@ import { Home, ImageIcon, Palette, Sparkles, LogIn, LogOut, Menu, X, Dices, Came
 
 export default function Navigation() {
   const location = useLocation()
-  const { isAuthenticated, logout } = useAuth()
+  const { isAuthenticated, isAdmin, logout } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const isActive = (path: string) => location.pathname === path
@@ -53,16 +53,18 @@ export default function Navigation() {
               </Link>
             </Button>
 
-            <Button
-              variant={isActive('/roulette') ? 'default' : 'ghost'}
-              size="sm"
-              asChild
-            >
-              <Link to="/roulette">
-                <Dices className="h-4 w-4 mr-2" />
-                Roleta
-              </Link>
-            </Button>
+            {isAdmin && (
+              <Button
+                variant={isActive('/roulette') ? 'default' : 'ghost'}
+                size="sm"
+                asChild
+              >
+                <Link to="/roulette">
+                  <Dices className="h-4 w-4 mr-2" />
+                  Roleta
+                </Link>
+              </Button>
+            )}
 
             {isAuthenticated && (
               <>
@@ -77,27 +79,31 @@ export default function Navigation() {
                   </Link>
                 </Button>
 
-                <Button
-                  variant={isActive('/admin/prompts') ? 'default' : 'ghost'}
-                  size="sm"
-                  asChild
-                >
-                  <Link to="/admin/prompts">
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    Prompts
-                  </Link>
-                </Button>
+                {isAdmin && (
+                  <>
+                    <Button
+                      variant={isActive('/admin/prompts') ? 'default' : 'ghost'}
+                      size="sm"
+                      asChild
+                    >
+                      <Link to="/admin/prompts">
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        Prompts
+                      </Link>
+                    </Button>
 
-                <Button
-                  variant={isActive('/admin/generate') ? 'default' : 'ghost'}
-                  size="sm"
-                  asChild
-                >
-                  <Link to="/admin/generate">
-                    <Palette className="h-4 w-4 mr-2" />
-                    Gerar
-                  </Link>
-                </Button>
+                    <Button
+                      variant={isActive('/admin/generate') ? 'default' : 'ghost'}
+                      size="sm"
+                      asChild
+                    >
+                      <Link to="/admin/generate">
+                        <Palette className="h-4 w-4 mr-2" />
+                        Gerar
+                      </Link>
+                    </Button>
+                  </>
+                )}
               </>
             )}
 
@@ -174,17 +180,19 @@ export default function Navigation() {
                 </Link>
               </Button>
 
-              <Button
-                variant={isActive('/roulette') ? 'default' : 'ghost'}
-                size="sm"
-                asChild
-                className="w-full justify-start h-12 text-base"
-              >
-                <Link to="/roulette" onClick={closeMobileMenu}>
-                  <Dices className="h-5 w-5 mr-3" />
-                  Roleta
-                </Link>
-              </Button>
+              {isAdmin && (
+                <Button
+                  variant={isActive('/roulette') ? 'default' : 'ghost'}
+                  size="sm"
+                  asChild
+                  className="w-full justify-start h-12 text-base"
+                >
+                  <Link to="/roulette" onClick={closeMobileMenu}>
+                    <Dices className="h-5 w-5 mr-3" />
+                    Roleta
+                  </Link>
+                </Button>
+              )}
 
               {isAuthenticated && (
                 <>
@@ -200,29 +208,33 @@ export default function Navigation() {
                     </Link>
                   </Button>
 
-                  <Button
-                    variant={isActive('/admin/prompts') ? 'default' : 'ghost'}
-                    size="sm"
-                    asChild
-                    className="w-full justify-start h-12 text-base"
-                  >
-                    <Link to="/admin/prompts" onClick={closeMobileMenu}>
-                      <Sparkles className="h-5 w-5 mr-3" />
-                      Prompts
-                    </Link>
-                  </Button>
+                  {isAdmin && (
+                    <>
+                      <Button
+                        variant={isActive('/admin/prompts') ? 'default' : 'ghost'}
+                        size="sm"
+                        asChild
+                        className="w-full justify-start h-12 text-base"
+                      >
+                        <Link to="/admin/prompts" onClick={closeMobileMenu}>
+                          <Sparkles className="h-5 w-5 mr-3" />
+                          Prompts
+                        </Link>
+                      </Button>
 
-                  <Button
-                    variant={isActive('/admin/generate') ? 'default' : 'ghost'}
-                    size="sm"
-                    asChild
-                    className="w-full justify-start h-12 text-base"
-                  >
-                    <Link to="/admin/generate" onClick={closeMobileMenu}>
-                      <Palette className="h-5 w-5 mr-3" />
-                      Gerar
-                    </Link>
-                  </Button>
+                      <Button
+                        variant={isActive('/admin/generate') ? 'default' : 'ghost'}
+                        size="sm"
+                        asChild
+                        className="w-full justify-start h-12 text-base"
+                      >
+                        <Link to="/admin/generate" onClick={closeMobileMenu}>
+                          <Palette className="h-5 w-5 mr-3" />
+                          Gerar
+                        </Link>
+                      </Button>
+                    </>
+                  )}
                 </>
               )}
 

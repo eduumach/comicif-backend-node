@@ -4,10 +4,11 @@ import { Loader2 } from "lucide-react"
 
 interface ProtectedRouteProps {
   children: React.ReactNode
+  requireAdmin?: boolean
 }
 
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuthenticated, loading } = useAuth()
+export default function ProtectedRoute({ children, requireAdmin = false }: ProtectedRouteProps) {
+  const { isAuthenticated, isAdmin, loading } = useAuth()
   const location = useLocation()
 
   if (loading) {
@@ -21,6 +22,11 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   if (!isAuthenticated) {
     // Redirect to login page with return url
     return <Navigate to="/login" state={{ from: location }} replace />
+  }
+
+  if (requireAdmin && !isAdmin) {
+    // Redirect to home if admin access is required but user is not admin
+    return <Navigate to="/" replace />
   }
 
   return <>{children}</>

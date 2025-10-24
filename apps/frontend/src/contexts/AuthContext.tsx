@@ -4,6 +4,8 @@ import { config } from '@/config/env'
 interface AuthContextType {
   isAuthenticated: boolean
   token: string | null
+  tokenType: 'admin' | 'upload-only' | null
+  isAdmin: boolean
   login: (password: string) => Promise<void>
   logout: () => void
   loading: boolean
@@ -13,13 +15,16 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null)
+  const [tokenType, setTokenType] = useState<'admin' | 'upload-only' | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     // Check for stored token on mount
     const storedToken = localStorage.getItem('comicif_token')
-    if (storedToken) {
+    const storedTokenType = localStorage.getItem('comicif_token_type') as 'admin' | 'upload-only' | null
+    if (storedToken && storedTokenType) {
       setToken(storedToken)
+      setTokenType(storedTokenType)
     }
     setLoading(false)
   }, [])
@@ -41,9 +46,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const data = await response.json()
       const authToken = data.token
+      const authTokenType = data.tokenType || 'admin'
 
       setToken(authToken)
+      setTokenType(authTokenType)
       localStorage.setItem('comicif_token', authToken)
+      localStorage.setItem('comicif_token_type', authTokenType)
     } catch (error) {
       console.error('Login error:', error)
       throw error
@@ -52,12 +60,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     setToken(null)
+    setTokenType(null)
     localStorage.removeItem('comicif_token')
+    localStorage.removeItem('comicif_token_type')
   }
 
   const value = {
     isAuthenticated: !!token,
     token,
+    tokenType,
+    isAdmin: tokenType === 'admin',
     login,
     logout,
     loading,
