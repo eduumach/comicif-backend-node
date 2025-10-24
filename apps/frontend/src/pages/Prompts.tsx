@@ -224,7 +224,7 @@ export default function Prompts() {
           ) : (
             <>
               {/* Desktop Table View */}
-              <div className="hidden lg:block max-h-[600px] overflow-auto">
+              <div className="hidden lg:block max-h-[600px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -240,13 +240,15 @@ export default function Prompts() {
                     {prompts.map((prompt) => (
                       <TableRow key={prompt.id}>
                         <TableCell className="font-medium">{prompt.title}</TableCell>
-                        <TableCell className="max-w-md">
-                          <div className="max-h-20 overflow-y-auto text-sm">
+                        <TableCell className="min-w-[500px] max-w-3xl">
+                          <div className="max-h-24 overflow-y-auto text-sm p-2 bg-muted/50 rounded-md whitespace-pre-wrap break-words [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                             {prompt.prompt}
                           </div>
                         </TableCell>
-                        <TableCell>
-                          {prompt.category ? MediaCategoryLabels[prompt.category] : '-'}
+                        <TableCell className="min-w-[140px]">
+                          <span className="inline-block px-3 py-1.5 rounded-md bg-primary/10 text-primary font-medium">
+                            {prompt.category ? MediaCategoryLabels[prompt.category] : '-'}
+                          </span>
                         </TableCell>
                         <TableCell>{prompt.person_count}</TableCell>
                         <TableCell>
