@@ -61,10 +61,10 @@ export default function Gallery() {
     <div className="space-y-4 sm:space-y-6 pb-4">
       <div className="space-y-2 sm:space-y-3">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-          Photo Gallery
+          Galeria de Fotos
         </h1>
         <p className="text-sm sm:text-base text-muted-foreground">
-          Explore our collection of AI-generated images. Click to view, like or download.
+          Explore nossa coleção de imagens geradas por IA. Clique para visualizar, curtir ou baixar.
         </p>
       </div>
 
@@ -79,8 +79,8 @@ export default function Gallery() {
       {photos.length === 0 ? (
         <Card>
           <CardContent className="text-center py-12">
-            <p className="text-muted-foreground mb-2">No images generated yet</p>
-            <p className="text-sm text-muted-foreground">Generate your first image to see it here</p>
+            <p className="text-muted-foreground mb-2">Nenhuma imagem gerada ainda</p>
+            <p className="text-sm text-muted-foreground">Gere sua primeira imagem para vê-la aqui</p>
           </CardContent>
         </Card>
       ) : (

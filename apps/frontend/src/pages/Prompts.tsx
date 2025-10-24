@@ -86,7 +86,7 @@ export default function Prompts() {
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">Prompts</h1>
           <p className="text-sm sm:text-base text-muted-foreground">
-            Create and manage your AI prompts
+            Crie e gerencie seus prompts de IA
           </p>
         </div>
 
@@ -94,25 +94,25 @@ export default function Prompts() {
           <DialogTrigger asChild>
             <Button className="w-full sm:w-auto min-h-[44px]">
               <Plus className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">New Prompt</span>
-              <span className="sm:hidden">New</span>
+              <span className="hidden sm:inline">Novo Prompt</span>
+              <span className="sm:hidden">Novo</span>
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-[95vw] sm:max-w-lg max-h-[95vh] p-3 sm:p-6">
             <DialogHeader>
-              <DialogTitle className="text-lg">Create New Prompt</DialogTitle>
+              <DialogTitle className="text-lg">Criar Novo Prompt</DialogTitle>
               <DialogDescription className="text-sm">
-                Add a new prompt for AI image generation
+                Adicione um novo prompt para geração de imagens com IA
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit}>
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium">Title</label>
+                  <label className="text-sm font-medium">Título</label>
                   <Input
                     value={formData.title}
                     onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                    placeholder="Enter prompt title"
+                    placeholder="Digite o título do prompt"
                     className="min-h-[44px]"
                     required
                   />
@@ -122,19 +122,19 @@ export default function Prompts() {
                   <Textarea
                     value={formData.prompt}
                     onChange={(e) => setFormData(prev => ({ ...prev, prompt: e.target.value }))}
-                    placeholder="Enter your AI prompt"
+                    placeholder="Digite seu prompt de IA"
                     className="min-h-[100px] max-h-[200px] sm:max-h-[300px] resize-none overflow-y-auto"
                     required
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">Person Count</label>
+                  <label className="text-sm font-medium">Número de Pessoas</label>
                   <Input
                     type="number"
                     min="0"
                     value={formData.person_count}
                     onChange={(e) => setFormData(prev => ({ ...prev, person_count: parseInt(e.target.value) || 0 }))}
-                    placeholder="Number of people in the image"
+                    placeholder="Número de pessoas na imagem"
                     className="min-h-[44px]"
                   />
                 </div>
@@ -160,11 +160,11 @@ export default function Prompts() {
               </div>
               <DialogFooter className="mt-6 flex-col sm:flex-row gap-2">
                 <Button type="button" variant="outline" onClick={resetForm} className="w-full sm:w-auto min-h-[44px]">
-                  Cancel
+                  Cancelar
                 </Button>
                 <Button type="submit" disabled={submitting} className="w-full sm:w-auto min-h-[44px]">
                   {submitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                  Create
+                  Criar
                 </Button>
               </DialogFooter>
             </form>
@@ -210,16 +210,16 @@ export default function Prompts() {
 
       <Card>
         <CardHeader>
-          <CardTitle>All Prompts</CardTitle>
+          <CardTitle>Todos os Prompts</CardTitle>
           <CardDescription>
-            {prompts.length} prompt{prompts.length !== 1 ? 's' : ''} available
+            {prompts.length} prompt{prompts.length !== 1 ? 's' : ''} disponível{prompts.length !== 1 ? 'is' : ''}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {prompts.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-muted-foreground">No prompts created yet</p>
-              <p className="text-sm text-muted-foreground">Create your first prompt to get started</p>
+              <p className="text-muted-foreground">Nenhum prompt criado ainda</p>
+              <p className="text-sm text-muted-foreground">Crie seu primeiro prompt para começar</p>
             </div>
           ) : (
             <>
@@ -228,12 +228,12 @@ export default function Prompts() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Title</TableHead>
+                      <TableHead>Título</TableHead>
                       <TableHead>Prompt</TableHead>
                       <TableHead>Categoria</TableHead>
-                      <TableHead>People</TableHead>
-                      <TableHead>Created</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                      <TableHead>Pessoas</TableHead>
+                      <TableHead>Criado</TableHead>
+                      <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -309,8 +309,8 @@ export default function Prompts() {
                                   {MediaCategoryLabels[prompt.category]}
                                 </span>
                               )}
-                              <span>People: {prompt.person_count}</span>
-                              <span>{new Date(prompt.createdAt).toLocaleDateString()}</span>
+                              <span>Pessoas: {prompt.person_count}</span>
+                              <span>{new Date(prompt.createdAt).toLocaleDateString('pt-BR')}</span>
                             </div>
                           </div>
                           <div className="flex gap-2 ml-2">
@@ -330,19 +330,19 @@ export default function Prompts() {
                               </AlertDialogTrigger>
                               <AlertDialogContent>
                                 <AlertDialogHeader>
-                                  <AlertDialogTitle>Delete Prompt</AlertDialogTitle>
+                                  <AlertDialogTitle>Excluir Prompt</AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    Are you sure you want to delete "{prompt.title}"?
-                                    This action cannot be undone.
+                                    Tem certeza que deseja excluir "{prompt.title}"?
+                                    Esta ação não pode ser desfeita.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
                                   <AlertDialogAction
                                     onClick={() => handleDelete(prompt.id)}
                                     className="bg-destructive hover:bg-destructive/90"
                                   >
-                                    Delete
+                                    Excluir
                                   </AlertDialogAction>
                                 </AlertDialogFooter>
                               </AlertDialogContent>
@@ -366,9 +366,9 @@ export default function Prompts() {
       <Dialog open={!!editingPrompt} onOpenChange={(open) => !open && setEditingPrompt(null)}>
         <DialogContent className="max-w-[95vw] sm:max-w-lg max-h-[95vh] p-3 sm:p-6">
           <DialogHeader>
-            <DialogTitle className="text-lg">Edit Prompt</DialogTitle>
+            <DialogTitle className="text-lg">Editar Prompt</DialogTitle>
             <DialogDescription className="text-sm">
-              Update your prompt details
+              Atualize os detalhes do seu prompt
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit}>
@@ -426,11 +426,11 @@ export default function Prompts() {
             </div>
             <DialogFooter className="mt-6 flex-col sm:flex-row gap-2">
               <Button type="button" variant="outline" onClick={resetForm} className="w-full sm:w-auto min-h-[44px]">
-                Cancel
+                Cancelar
               </Button>
               <Button type="submit" disabled={submitting} className="w-full sm:w-auto min-h-[44px]">
                 {submitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                Update
+                Atualizar
               </Button>
             </DialogFooter>
           </form>

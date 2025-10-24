@@ -40,7 +40,7 @@ export default function Generate() {
 
   const handleGenerate = async (prompt: Prompt) => {
     if (!selectedFile) {
-      alert('Please select an image file first')
+      alert('Por favor, selecione um arquivo de imagem primeiro')
       return
     }
 
@@ -57,7 +57,7 @@ export default function Generate() {
 
   const handleRandomGenerate = async () => {
     if (!selectedFile) {
-      alert('Please select an image file first')
+      alert('Por favor, selecione um arquivo de imagem primeiro')
       return
     }
 
@@ -78,7 +78,7 @@ export default function Generate() {
       setSelectedFile(file)
       setCapturedImage(null)
     } else {
-      alert('Please select a valid image file')
+      alert('Por favor, selecione um arquivo de imagem válido')
     }
   }
 
@@ -86,7 +86,7 @@ export default function Generate() {
     setCameraLoading(true)
     try {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        alert('Camera not supported in this browser.')
+        alert('Câmera não suportada neste navegador.')
         return
       }
 
@@ -131,16 +131,16 @@ export default function Generate() {
       console.error('Camera error:', err)
       if (err instanceof Error) {
         if (err.name === 'NotAllowedError') {
-          alert('Camera access denied. Please allow camera permissions and try again.')
+          alert('Acesso à câmera negado. Por favor, permita o acesso à câmera e tente novamente.')
         } else if (err.name === 'NotFoundError') {
-          alert('No camera found on this device.')
+          alert('Nenhuma câmera encontrada neste dispositivo.')
         } else if (err.name === 'NotSupportedError') {
-          alert('Camera not supported in this browser.')
+          alert('Câmera não suportada neste navegador.')
         } else {
-          alert('Unable to access camera. Please check permissions and try again.')
+          alert('Não foi possível acessar a câmera. Por favor, verifique as permissões e tente novamente.')
         }
       } else {
-        alert('Unable to access camera. Please check permissions and try again.')
+        alert('Não foi possível acessar a câmera. Por favor, verifique as permissões e tente novamente.')
       }
     }
   }
@@ -205,9 +205,9 @@ export default function Generate() {
   return (
     <div className="space-y-4 sm:space-y-6 pb-4">
       <div className="space-y-1 sm:space-y-2">
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Generate Images</h1>
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Gerar Imagens</h1>
         <p className="text-sm sm:text-base text-muted-foreground">
-          Upload an image or take a photo and select a prompt to generate a new AI image
+          Envie uma imagem ou tire uma foto e selecione um prompt para gerar uma nova imagem com IA
         </p>
       </div>
 
@@ -321,16 +321,16 @@ export default function Generate() {
         <CardHeader className="pb-3 sm:pb-6">
           <CardTitle className="flex items-center text-base sm:text-lg">
             <Upload className="h-5 w-5 mr-2" />
-            Upload Base Image
+            Enviar Imagem Base
           </CardTitle>
           <CardDescription className="text-sm">
-            Select an image file or take a photo that will be used as the base for generation
+            Selecione um arquivo de imagem ou tire uma foto que será usada como base para a geração
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3 sm:space-y-4">
             <div>
-              <div className="text-sm font-medium mb-2">Image File</div>
+              <div className="text-sm font-medium mb-2">Arquivo de Imagem</div>
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <div className="flex-1">
                   <Input
@@ -349,17 +349,17 @@ export default function Generate() {
                   className="min-h-[48px] w-full sm:w-auto px-4 text-base"
                 >
                   <Camera className="h-5 w-5 mr-2" />
-                  <span>Take Photo</span>
+                  <span>Tirar Foto</span>
                 </Button>
               </div>
             </div>
             {capturedImage && (
               <div className="space-y-2">
-                <div className="text-sm font-medium">Captured Photo</div>
+                <div className="text-sm font-medium">Foto Capturada</div>
                 <div className="relative w-28 h-28 sm:w-32 sm:h-32 bg-muted rounded-lg overflow-hidden shadow-sm">
                   <img
                     src={capturedImage}
-                    alt="Captured"
+                    alt="Capturada"
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -369,7 +369,7 @@ export default function Generate() {
                   size="sm"
                   className="min-h-[48px] text-base"
                 >
-                  Retake Photo
+                  Tirar Outra Foto
                 </Button>
               </div>
             )}
@@ -388,14 +388,14 @@ export default function Generate() {
               {generating && isRandomGeneration ? (
                 <>
                   <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                  <span className="hidden sm:inline">Generating Random...</span>
-                  <span className="sm:hidden">Generating...</span>
+                  <span className="hidden sm:inline">Gerando Aleatório...</span>
+                  <span className="sm:hidden">Gerando...</span>
                 </>
               ) : (
                 <>
                   <Shuffle className="h-5 w-5 mr-2" />
-                  <span className="hidden sm:inline">Generate with Random Prompt</span>
-                  <span className="sm:hidden">Random Generate</span>
+                  <span className="hidden sm:inline">Gerar com Prompt Aleatório</span>
+                  <span className="sm:hidden">Gerar Aleatório</span>
                 </>
               )}
             </Button>
@@ -415,15 +415,15 @@ export default function Generate() {
         <Card>
           <CardContent className="text-center py-8 sm:py-12 px-4">
             <Sparkles className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4 text-muted-foreground" />
-            <p className="text-muted-foreground mb-2 text-sm sm:text-base">No prompts available</p>
+            <p className="text-muted-foreground mb-2 text-sm sm:text-base">Nenhum prompt disponível</p>
             <p className="text-xs sm:text-sm text-muted-foreground mb-4">
-              Create some prompts first to generate images
+              Crie alguns prompts primeiro para gerar imagens
             </p>
             <Button
               onClick={() => window.location.href = '/prompts'}
               className="min-h-[48px] text-base"
             >
-              Create Prompts
+              Criar Prompts
             </Button>
           </CardContent>
         </Card>
@@ -480,13 +480,13 @@ export default function Generate() {
                     {generating && selectedPrompt?.id === prompt.id && !isRandomGeneration ? (
                       <>
                         <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                        <span className="hidden sm:inline">Generating...</span>
-                        <span className="sm:hidden">Gen...</span>
+                        <span className="hidden sm:inline">Gerando...</span>
+                        <span className="sm:hidden">Ger...</span>
                       </>
                     ) : (
                       <>
                         <Sparkles className="h-5 w-5 mr-2" />
-                        Generate
+                        Gerar
                       </>
                     )}
                   </Button>
@@ -504,13 +504,13 @@ export default function Generate() {
             <div className="flex items-center space-x-3">
               <Loader2 className="h-5 w-5 animate-spin text-primary" />
               <div>
-                <p className="font-medium">Generating image...</p>
+                <p className="font-medium">Gerando imagem...</p>
                 <p className="text-sm text-muted-foreground">
                   {isRandomGeneration
-                    ? 'Using a random prompt from the database'
+                    ? 'Usando um prompt aleatório do banco de dados'
                     : selectedPrompt
-                      ? `Using prompt: "${selectedPrompt.title}"`
-                      : 'Processing...'
+                      ? `Usando prompt: "${selectedPrompt.title}"`
+                      : 'Processando...'
                   }
                 </p>
               </div>
@@ -525,7 +525,7 @@ export default function Generate() {
           <DialogHeader className="pb-2">
             <DialogTitle className="flex items-center text-base sm:text-lg">
               <Camera className="h-5 w-5 mr-2" />
-              Take Photo
+              Tirar Foto
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-3 sm:space-y-4">
@@ -574,13 +574,13 @@ export default function Generate() {
                     variant="outline"
                     className="w-full sm:w-auto min-h-[48px] text-base"
                   >
-                    Retake
+                    Tirar Outra
                   </Button>
                   <Button
                     onClick={stopCamera}
                     className="w-full sm:w-auto min-h-[48px] text-base"
                   >
-                    Use Photo
+                    Usar Foto
                   </Button>
                 </div>
               </>
@@ -597,7 +597,7 @@ export default function Generate() {
             <DialogHeader className="pb-2">
               <DialogTitle className="flex items-center text-base sm:text-lg">
                 <ImageIcon className="h-5 w-5 mr-2" />
-                Image Generated Successfully!
+                Imagem Gerada com Sucesso!
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-3 sm:space-y-4">
@@ -622,7 +622,7 @@ export default function Generate() {
 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <p className="text-xs sm:text-sm text-muted-foreground">
-                    Generated: {new Date(generatedPhoto.createdAt).toLocaleString()}
+                    Gerada em: {new Date(generatedPhoto.createdAt).toLocaleString('pt-BR')}
                   </p>
                   <div className="flex flex-col sm:flex-row gap-2 sm:gap-2">
                     <Button
@@ -630,13 +630,13 @@ export default function Generate() {
                       onClick={() => window.location.href = '/gallery'}
                       className="w-full sm:w-auto min-h-[48px] text-base"
                     >
-                      View Gallery
+                      Ver Galeria
                     </Button>
                     <Button
                       onClick={() => setShowResult(false)}
                       className="w-full sm:w-auto min-h-[48px] text-base"
                     >
-                      Generate Another
+                      Gerar Outra
                     </Button>
                   </div>
                 </div>

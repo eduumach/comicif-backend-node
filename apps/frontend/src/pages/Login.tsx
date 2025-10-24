@@ -17,7 +17,7 @@ export default function Login() {
     e.preventDefault()
 
     if (!password.trim()) {
-      setError("Password is required")
+      setError("Senha é obrigatória")
       return
     }
 
@@ -28,7 +28,7 @@ export default function Login() {
       await login(password)
       navigate("/")
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed")
+      setError(err instanceof Error ? err.message : "Falha no login")
     } finally {
       setLoading(false)
     }
@@ -43,9 +43,9 @@ export default function Login() {
               <Lock className="h-6 w-6 text-primary" />
             </div>
           </div>
-          <CardTitle className="text-xl sm:text-2xl">Login to ComicIF</CardTitle>
+          <CardTitle className="text-xl sm:text-2xl">Login no ComicIF</CardTitle>
           <CardDescription className="text-sm">
-            Enter your password to access the admin features
+            Digite sua senha para acessar os recursos de administração
           </CardDescription>
         </CardHeader>
         <CardContent className="p-4 sm:p-6">
@@ -53,7 +53,7 @@ export default function Login() {
             <div>
               <Input
                 type="password"
-                placeholder="Enter password"
+                placeholder="Digite a senha"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
@@ -71,17 +71,17 @@ export default function Login() {
               {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Logging in...
+                  Entrando...
                 </>
               ) : (
-                "Login"
+                "Entrar"
               )}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
-              Default password: <code className="bg-muted px-2 py-1 rounded text-xs sm:text-sm">admin123</code>
+              Senha padrão: <code className="bg-muted px-2 py-1 rounded text-xs sm:text-sm">admin123</code>
             </p>
           </div>
         </CardContent>

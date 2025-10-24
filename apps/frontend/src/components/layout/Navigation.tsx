@@ -38,7 +38,7 @@ export default function Navigation() {
             >
               <Link to="/">
                 <ImageIcon className="h-4 w-4 mr-2" />
-                Gallery
+                Galeria
               </Link>
             </Button>
 
@@ -49,7 +49,7 @@ export default function Navigation() {
             >
               <Link to="/home">
                 <Home className="h-4 w-4 mr-2" />
-                About
+                Sobre
               </Link>
             </Button>
 
@@ -60,7 +60,7 @@ export default function Navigation() {
             >
               <Link to="/roulette">
                 <Dices className="h-4 w-4 mr-2" />
-                Roulette
+                Roleta
               </Link>
             </Button>
 
@@ -84,7 +84,7 @@ export default function Navigation() {
                 >
                   <Link to="/admin/generate">
                     <Palette className="h-4 w-4 mr-2" />
-                    Generate
+                    Gerar
                   </Link>
                 </Button>
               </>
@@ -99,7 +99,7 @@ export default function Navigation() {
                   onClick={logout}
                 >
                   <LogOut className="h-4 w-4 mr-2" />
-                  Logout
+                  Sair
                 </Button>
               ) : (
                 <Button
@@ -109,7 +109,7 @@ export default function Navigation() {
                 >
                   <Link to="/login">
                     <LogIn className="h-4 w-4 mr-2" />
-                    Login
+                    Entrar
                   </Link>
                 </Button>
               )}
@@ -147,7 +147,7 @@ export default function Navigation() {
               >
                 <Link to="/" onClick={closeMobileMenu}>
                   <ImageIcon className="h-5 w-5 mr-3" />
-                  Gallery
+                  Galeria
                 </Link>
               </Button>
 
@@ -159,7 +159,7 @@ export default function Navigation() {
               >
                 <Link to="/home" onClick={closeMobileMenu}>
                   <Home className="h-5 w-5 mr-3" />
-                  About
+                  Sobre
                 </Link>
               </Button>
 
@@ -171,7 +171,7 @@ export default function Navigation() {
               >
                 <Link to="/roulette" onClick={closeMobileMenu}>
                   <Dices className="h-5 w-5 mr-3" />
-                  Roulette
+                  Roleta
                 </Link>
               </Button>
 
@@ -197,7 +197,7 @@ export default function Navigation() {
                   >
                     <Link to="/admin/generate" onClick={closeMobileMenu}>
                       <Palette className="h-5 w-5 mr-3" />
-                      Generate
+                      Gerar
                     </Link>
                   </Button>
                 </>
@@ -215,7 +215,7 @@ export default function Navigation() {
                     className="w-full justify-start h-12 text-base"
                   >
                     <LogOut className="h-5 w-5 mr-3" />
-                    Logout
+                    Sair
                   </Button>
                 ) : (
                   <Button
@@ -226,7 +226,7 @@ export default function Navigation() {
                   >
                     <Link to="/login" onClick={closeMobileMenu}>
                       <LogIn className="h-5 w-5 mr-3" />
-                      Login
+                      Entrar
                     </Link>
                   </Button>
                 )}
