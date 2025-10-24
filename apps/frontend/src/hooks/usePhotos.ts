@@ -57,12 +57,22 @@ export function usePhotos() {
   }
 
   const likePhoto = async (id: number) => {
+    // Atualização otimista - incrementa o like imediatamente
+    setPhotos(prev => prev.map(p =>
+      p.id === id ? { ...p, likes: p.likes + 1 } : p
+    ))
+
     try {
       setError(null)
       const updatedPhoto = await photoService.like(id)
+      // Atualiza com os dados reais do servidor
       setPhotos(prev => prev.map(p => p.id === id ? updatedPhoto : p))
       return updatedPhoto
     } catch (err) {
+      // Reverte o like em caso de erro
+      setPhotos(prev => prev.map(p =>
+        p.id === id ? { ...p, likes: p.likes - 1 } : p
+      ))
       const errorMessage = err instanceof Error ? err.message : 'Failed to like photo'
       setError(errorMessage)
       throw new Error(errorMessage)

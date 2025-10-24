@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -10,6 +10,16 @@ export default function Gallery() {
   const { photos, loading, error, likePhoto } = usePhotos()
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null)
   const [likingPhoto, setLikingPhoto] = useState<number | null>(null)
+
+  // Sincroniza selectedPhoto quando photos mudar (para atualizar likes em tempo real)
+  useEffect(() => {
+    if (selectedPhoto) {
+      const updatedPhoto = photos.find(p => p.id === selectedPhoto.id)
+      if (updatedPhoto) {
+        setSelectedPhoto(updatedPhoto)
+      }
+    }
+  }, [photos, selectedPhoto])
 
   const handleLike = async (photo: Photo) => {
     setLikingPhoto(photo.id)
@@ -74,7 +84,7 @@ export default function Gallery() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-2 sm:gap-3 auto-rows-[200px] sm:auto-rows-[240px] grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        <div className="grid gap-2 sm:gap-3 auto-rows-[200px] sm:auto-rows-[240px] grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" style={{ gridAutoFlow: 'dense' }}>
           {photos.map((photo, index) => {
             // Padrão mais controlado para evitar buracos
             const isLarge = index % 10 === 0
@@ -162,72 +172,77 @@ export default function Gallery() {
         </div>
       )}
 
-      {/* Photo Detail Dialog */}
+      {/* Photo Detail Dialog - Mobile Optimized */}
       <Dialog open={!!selectedPhoto} onOpenChange={(open) => !open && setSelectedPhoto(null)}>
         {selectedPhoto && (
-          <DialogContent className="max-w-[96vw] sm:max-w-4xl lg:max-w-6xl max-h-[95vh] p-0 overflow-hidden">
-            <div className="flex flex-col h-full max-h-[95vh]">
-              {/* Header */}
-              <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-3 border-b">
-                <DialogTitle className="text-lg sm:text-xl md:text-2xl font-bold pr-8">
+          <DialogContent className="max-w-full sm:max-w-4xl lg:max-w-6xl w-full h-full sm:h-auto sm:max-h-[95vh] p-0 overflow-hidden gap-0">
+            <div className="flex flex-col h-full sm:max-h-[95vh]">
+              {/* Header - Compacto no mobile */}
+              <DialogHeader className="px-4 sm:px-6 pt-3 sm:pt-6 pb-2 sm:pb-3 border-b shrink-0">
+                <DialogTitle className="text-base sm:text-xl md:text-2xl font-bold pr-8 line-clamp-2">
                   {selectedPhoto.prompt.title}
                 </DialogTitle>
-                <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground mt-2">
-                  <Calendar className="h-4 w-4" />
-                  <span>{new Date(selectedPhoto.createdAt).toLocaleString()}</span>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                  <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span>{new Date(selectedPhoto.createdAt).toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                  })}</span>
                 </div>
               </DialogHeader>
 
-              {/* Image */}
-              <div className="flex-1 flex items-center justify-center bg-black/5 dark:bg-black/20 p-3 sm:p-6 overflow-hidden">
+              {/* Image - Ocupa todo espaço disponível no mobile */}
+              <div className="flex-1 flex items-center justify-center bg-black/5 dark:bg-black/20 p-2 sm:p-6 overflow-hidden min-h-0">
                 <img
                   src={selectedPhoto.path}
                   alt={selectedPhoto.prompt.title}
                   className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
-                  style={{ maxHeight: 'calc(95vh - 200px)' }}
                   onError={(e) => {
                     e.currentTarget.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23f3f4f6"/><text x="50" y="50" text-anchor="middle" dy=".3em" fill="%236b7280">No Image</text></svg>'
                   }}
                 />
               </div>
 
-              {/* Footer Actions */}
-              <div className="px-4 sm:px-6 py-4 border-t bg-background/50 backdrop-blur-sm">
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+              {/* Footer Actions - Fixo na parte inferior no mobile */}
+              <div className="px-4 sm:px-6 py-3 sm:py-4 border-t bg-background shrink-0 safe-bottom">
+                <div className="flex flex-col gap-3">
                   {/* Likes Display */}
-                  <div className="flex items-center gap-2 text-sm">
-                    <Heart className="h-5 w-5 text-red-500 fill-red-500" />
-                    <span className="font-semibold">{selectedPhoto.likes}</span>
+                  <div className="flex items-center justify-center gap-2 text-sm">
+                    <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-red-500 fill-red-500" />
+                    <span className="font-semibold text-base sm:text-lg">{selectedPhoto.likes}</span>
                     <span className="text-muted-foreground">
-                      {selectedPhoto.likes === 1 ? 'like' : 'likes'}
+                      {selectedPhoto.likes === 1 ? 'curtida' : 'curtidas'}
                     </span>
                   </div>
 
-                  {/* Action Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                  {/* Action Buttons - Grid 2 colunas no mobile */}
+                  <div className="grid grid-cols-2 gap-2 sm:gap-3">
                     <Button
-                      variant="default"
+                      variant="outline"
                       onClick={() => handleLike(selectedPhoto)}
                       disabled={likingPhoto === selectedPhoto.id}
                       size="lg"
-                      className="w-full sm:w-auto min-h-[48px]"
+                      className="w-full min-h-[52px] sm:min-h-[48px] text-base touch-manipulation"
                     >
                       {likingPhoto === selectedPhoto.id ? (
-                        <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                        <Loader2 className="h-5 w-5 sm:mr-2 animate-spin" />
                       ) : (
-                        <Heart className="h-5 w-5 mr-2" />
+                        <>
+                          <Heart className="h-5 w-5 sm:mr-2" />
+                          <span className="hidden sm:inline">Curtir</span>
+                        </>
                       )}
-                      Like
                     </Button>
 
                     <Button
-                      variant="outline"
+                      variant="default"
                       onClick={() => handleDownload(selectedPhoto)}
                       size="lg"
-                      className="w-full sm:w-auto min-h-[48px]"
+                      className="w-full min-h-[52px] sm:min-h-[48px] text-base touch-manipulation"
                     >
-                      <Download className="h-5 w-5 mr-2" />
-                      Download
+                      <Download className="h-5 w-5 sm:mr-2" />
+                      <span className="hidden sm:inline">Baixar</span>
                     </Button>
                   </div>
                 </div>
