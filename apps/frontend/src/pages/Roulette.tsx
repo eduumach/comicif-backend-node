@@ -83,13 +83,6 @@ export default function Roulette() {
     }
   };
 
-  const handleGenerateWithResult = () => {
-    if (currentResult) {
-      // Redirecionar para a página de geração com o resultado da roleta
-      navigate('/admin/generate', { state: { rouletteResult: currentResult } });
-    }
-  };
-
   const handleGenerateWithPrompt = () => {
     if (drawnPrompt) {
       // Redirecionar para a página de geração com o prompt sorteado
@@ -142,22 +135,6 @@ export default function Roulette() {
       console.error('Error spinning prompt roulette:', err);
       setError('Erro ao girar a roleta de prompts');
       setSpinningPrompt(false);
-    }
-  };
-
-  const handleDrawRandomPrompt = async () => {
-    try {
-      setDrawingPrompt(true);
-      setError(null);
-      const prompt = await rouletteService.drawRandomPrompt();
-      setDrawnPrompt(prompt);
-      // Limpar resultado da categoria quando sortear prompt aleatório
-      setCurrentResult(null);
-    } catch (err) {
-      console.error('Error drawing random prompt:', err);
-      setError('Erro ao sortear prompt aleatório');
-    } finally {
-      setDrawingPrompt(false);
     }
   };
 
