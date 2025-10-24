@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react"
 import { useLocation } from "react-router-dom"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { usePrompts } from "@/hooks/usePrompts"
@@ -9,12 +9,12 @@ import { usePhotos } from "@/hooks/usePhotos"
 import type { Prompt } from "@/services/prompts"
 import type { Photo } from "@/services/photos"
 import type { RouletteResult } from "@/types/roulette"
-import { Loader2, Sparkles, Image as ImageIcon, Calendar, User, Upload, Shuffle, Camera, Dices, X } from "lucide-react"
+import { Loader2, Sparkles, Image as ImageIcon, Upload, Shuffle, Camera, X, ChevronDown } from "lucide-react"
 
 export default function Generate() {
   const location = useLocation()
-  const { prompts, loading: promptsLoading, error: promptsError } = usePrompts()
-  const { generatePhoto, generateRandomPhoto, generating, error: photosError } = usePhotos()
+  const { prompts } = usePrompts()
+  const { generatePhoto, generateRandomPhoto, generating, error } = usePhotos()
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(
     location.state?.selectedPrompt || null
   )
@@ -28,13 +28,14 @@ export default function Generate() {
   const [rouletteResult, setRouletteResult] = useState<RouletteResult | null>(
     location.state?.rouletteResult || null
   )
+  const [showPromptSelector, setShowPromptSelector] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
 
-  // Filtrar prompts pela categoria da roleta
-  const filteredPrompts = rouletteResult 
+  // Filtrar prompts pela categoria da roleta se houver
+  const availablePrompts = rouletteResult 
     ? prompts.filter(p => p.category === rouletteResult.selectedCategory)
     : prompts
 
@@ -192,332 +193,240 @@ export default function Generate() {
     }
   }, [])
 
-  const error = promptsError || photosError
-
-  if (promptsLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    )
-  }
-
   return (
-    <div className="space-y-4 sm:space-y-6 pb-4">
-      <div className="space-y-1 sm:space-y-2">
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Gerar Imagens</h1>
-        <p className="text-sm sm:text-base text-muted-foreground">
-          Envie uma imagem ou tire uma foto e selecione um prompt para gerar uma nova imagem com IA
-        </p>
+    <div className="space-y-6 pb-4 max-w-2xl mx-auto">
+      {/* Header */}
+      <div className="text-center space-y-2">
+        <h1 className="text-2xl sm:text-3xl font-bold">Gerar Imagem</h1>
+        {rouletteResult ? (
+          <p className="text-muted-foreground">
+            🎲 Categoria: <span className="font-semibold text-foreground">{rouletteResult.categoryLabel}</span>
+          </p>
+        ) : selectedPrompt ? (
+          <p className="text-muted-foreground">
+            ✨ {selectedPrompt.title}
+          </p>
+        ) : (
+          <p className="text-muted-foreground">
+            Tire ou envie uma foto e gere sua imagem
+          </p>
+        )}
       </div>
 
-      {/* Roulette Result Card */}
-      {rouletteResult && (
-        <Card className="border-green-500 bg-green-50/50">
-          <CardHeader className="pb-3 sm:pb-4">
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center text-base sm:text-lg">
-                <Dices className="h-5 w-5 mr-2" />
-                Resultado da Roleta
-              </CardTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setRouletteResult(null)}
-                className="h-8 w-8 p-0"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-            <CardDescription className="text-sm">
-              Você selecionou este resultado na roleta. Use-o para geração!
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-white border border-green-200 rounded-lg p-4">
-              <p className="font-semibold text-lg text-green-900">
-                {rouletteResult.categoryLabel}
-              </p>
-              <p className="text-xs text-green-600 mt-2">
-                Categoria: {rouletteResult.selectedCategory}
-              </p>
-            </div>
-            <p className="text-xs text-muted-foreground mt-3">
-              Esta categoria será usada para filtrar os prompts disponíveis
-            </p>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Selected Prompt from Roulette */}
-      {selectedPrompt && !rouletteResult && (
-        <Card className="border-blue-500 bg-blue-50/50">
-          <CardHeader className="pb-3 sm:pb-4">
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center text-base sm:text-lg">
-                <Sparkles className="h-5 w-5 mr-2" />
-                Prompt Selecionado da Roleta
-              </CardTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSelectedPrompt(null)}
-                className="h-8 w-8 p-0"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-            <CardDescription className="text-sm">
-              Este prompt foi selecionado na roleta. Faça upload de uma imagem e clique em "Gerar com Este Prompt"!
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-white border border-blue-200 rounded-lg p-4 space-y-3">
-              <div>
-                <p className="font-semibold text-lg text-blue-900">
-                  {selectedPrompt.title}
-                </p>
-                {/* <p className="text-sm text-blue-700 mt-2">
-                  {selectedPrompt.prompt}
-                </p> */}
+      {/* Image Preview/Upload */}
+      <Card>
+        <CardContent className="pt-6">
+          {!selectedFile && !capturedImage ? (
+            <div className="space-y-4">
+              <div className="border-2 border-dashed rounded-lg p-8 sm:p-12 text-center bg-muted/30">
+                <ImageIcon className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                <p className="text-muted-foreground mb-6">Adicione uma foto para começar</p>
+                
+                <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
+                  <Button
+                    onClick={() => fileInputRef.current?.click()}
+                    size="lg"
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    <Upload className="h-5 w-5 mr-2" />
+                    Escolher Arquivo
+                  </Button>
+                  <Button
+                    onClick={startCamera}
+                    size="lg"
+                    className="flex-1"
+                  >
+                    <Camera className="h-5 w-5 mr-2" />
+                    Tirar Foto
+                  </Button>
+                </div>
+                
+                <Input
+                  id="photo"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  ref={fileInputRef}
+                  className="hidden"
+                />
               </div>
-              {selectedPrompt.person_count !== null && selectedPrompt.person_count !== undefined && (
-                <div className="flex items-center text-xs text-blue-600">
-                  <User className="h-4 w-4 mr-1" />
-                  Pessoas: {selectedPrompt.person_count}
-                </div>
-              )}
-              {selectedPrompt.category && (
-                <div className="text-xs text-blue-600">
-                  Categoria: {selectedPrompt.category}
-                </div>
-              )}
             </div>
-            <div className="mt-4">
+          ) : (
+            <div className="space-y-4">
+              <div className="relative w-full max-w-lg mx-auto bg-muted rounded-lg overflow-hidden" style={{ maxHeight: '70vh' }}>
+                <img
+                  src={capturedImage || (selectedFile ? URL.createObjectURL(selectedFile) : '')}
+                  alt="Preview"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              
+              <div className="flex gap-2 justify-center">
+                <Button
+                  onClick={() => {
+                    setSelectedFile(null)
+                    setCapturedImage(null)
+                  }}
+                  variant="outline"
+                  size="sm"
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  Remover
+                </Button>
+                <Button
+                  onClick={startCamera}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Camera className="h-4 w-4 mr-1" />
+                  Tirar Outra
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Action Buttons */}
+      {selectedFile && (
+        <div className="space-y-3">
+          {selectedPrompt ? (
+            <>
               <Button
                 onClick={() => handleGenerate(selectedPrompt)}
-                disabled={!selectedFile || generating}
-                className="w-full min-h-[48px] text-base"
+                disabled={generating}
+                size="lg"
+                className="w-full"
               >
                 {generating && !isRandomGeneration ? (
                   <>
                     <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                    Gerando com Este Prompt...
+                    Gerando...
                   </>
                 ) : (
                   <>
                     <Sparkles className="h-5 w-5 mr-2" />
-                    Gerar com Este Prompt
+                    Gerar com "{selectedPrompt.title}"
                   </>
                 )}
               </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* File Upload Section */}
-      <Card>
-        <CardHeader className="pb-3 sm:pb-6">
-          <CardTitle className="flex items-center text-base sm:text-lg">
-            <Upload className="h-5 w-5 mr-2" />
-            Enviar Imagem Base
-          </CardTitle>
-          <CardDescription className="text-sm">
-            Selecione um arquivo de imagem ou tire uma foto que será usada como base para a geração
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3 sm:space-y-4">
-            <div>
-              <div className="text-sm font-medium mb-2">Arquivo de Imagem</div>
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                <div className="flex-1">
-                  <Input
-                    id="photo"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileSelect}
-                    ref={fileInputRef}
-                    className="min-h-[48px] text-sm"
-                  />
-                </div>
+              <Button
+                onClick={() => setShowPromptSelector(true)}
+                variant="outline"
+                size="sm"
+                className="w-full"
+              >
+                <ChevronDown className="h-4 w-4 mr-2" />
+                Escolher Outro Prompt
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                onClick={handleRandomGenerate}
+                disabled={generating}
+                size="lg"
+                className="w-full"
+              >
+                {generating && isRandomGeneration ? (
+                  <>
+                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                    Gerando...
+                  </>
+                ) : (
+                  <>
+                    <Shuffle className="h-5 w-5 mr-2" />
+                    Gerar com Prompt Aleatório
+                  </>
+                )}
+              </Button>
+              {availablePrompts.length > 0 && (
                 <Button
-                  onClick={startCamera}
-                  variant="outline"
-                  size="default"
-                  className="min-h-[48px] w-full sm:w-auto px-4 text-base"
-                >
-                  <Camera className="h-5 w-5 mr-2" />
-                  <span>Tirar Foto</span>
-                </Button>
-              </div>
-            </div>
-            {capturedImage && (
-              <div className="space-y-2">
-                <div className="text-sm font-medium">Foto Capturada</div>
-                <div className="relative w-28 h-28 sm:w-32 sm:h-32 bg-muted rounded-lg overflow-hidden shadow-sm">
-                  <img
-                    src={capturedImage}
-                    alt="Capturada"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <Button
-                  onClick={retakePhoto}
+                  onClick={() => setShowPromptSelector(true)}
                   variant="outline"
                   size="sm"
-                  className="min-h-[48px] text-base"
+                  className="w-full"
                 >
-                  Tirar Outra Foto
+                  <ChevronDown className="h-4 w-4 mr-2" />
+                  Escolher Prompt Manualmente
                 </Button>
-              </div>
-            )}
-            {selectedFile && !capturedImage && (
-              <div className="flex items-center space-x-2 text-sm text-muted-foreground bg-muted/50 rounded-md p-3">
-                <ImageIcon className="h-4 w-4 flex-shrink-0" />
-                <span className="truncate">{selectedFile.name}</span>
-              </div>
-            )}
-            <Button
-              onClick={handleRandomGenerate}
-              disabled={!selectedFile || generating}
-              className="w-full min-h-[48px] text-base"
-              variant="outline"
-            >
-              {generating && isRandomGeneration ? (
-                <>
-                  <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                  <span className="hidden sm:inline">Gerando Aleatório...</span>
-                  <span className="sm:hidden">Gerando...</span>
-                </>
-              ) : (
-                <>
-                  <Shuffle className="h-5 w-5 mr-2" />
-                  <span className="hidden sm:inline">Gerar com Prompt Aleatório</span>
-                  <span className="sm:hidden">Gerar Aleatório</span>
-                </>
               )}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+            </>
+          )}
 
-      {error && (
-        <Card className="border-destructive">
-          <CardContent className="pt-6">
-            <p className="text-destructive">Error: {error}</p>
-          </CardContent>
-        </Card>
-      )}
-
-      {prompts.length === 0 ? (
-        <Card>
-          <CardContent className="text-center py-8 sm:py-12 px-4">
-            <Sparkles className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4 text-muted-foreground" />
-            <p className="text-muted-foreground mb-2 text-sm sm:text-base">Nenhum prompt disponível</p>
-            <p className="text-xs sm:text-sm text-muted-foreground mb-4">
-              Crie alguns prompts primeiro para gerar imagens
-            </p>
+          {(selectedPrompt || rouletteResult) && (
             <Button
-              onClick={() => window.location.href = '/prompts'}
-              className="min-h-[48px] text-base"
+              onClick={() => {
+                setSelectedPrompt(null)
+                setRouletteResult(null)
+              }}
+              variant="ghost"
+              size="sm"
+              className="w-full"
             >
-              Criar Prompts
+              Limpar seleção da roleta
             </Button>
-          </CardContent>
-        </Card>
-      ) : filteredPrompts.length === 0 ? (
-        <Card className="border-amber-500 bg-amber-50/50">
-          <CardContent className="text-center py-8 sm:py-12 px-4">
-            <Sparkles className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4 text-amber-600" />
-            <p className="text-amber-900 mb-2 text-sm sm:text-base font-medium">
-              Nenhum prompt na categoria "{rouletteResult?.categoryLabel}"
-            </p>
-            <p className="text-xs sm:text-sm text-amber-700 mb-4">
-              Categoria da roleta: {rouletteResult?.selectedCategory}
-            </p>
-            <Button
-              onClick={() => setRouletteResult(null)}
-              variant="outline"
-              className="min-h-[48px] text-base"
-            >
-              Limpar Filtro da Roleta
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-          {filteredPrompts.map((prompt) => (
-            <Card key={prompt.id} className="group hover:shadow-md transition-shadow">
-              <CardHeader className="p-3 sm:p-4 md:p-6">
-                <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <span className="truncate text-sm sm:text-base md:text-lg">{prompt.title}</span>
-                  {prompt.person_count > 0 && (
-                    <div className="flex items-center text-xs sm:text-sm text-muted-foreground self-start sm:self-center">
-                      <User className="h-4 w-4 mr-1" />
-                      {prompt.person_count}
-                    </div>
-                  )}
-                </CardTitle>
-                <CardDescription className="line-clamp-3 text-xs sm:text-sm">
-                  {prompt.prompt}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3">
-                  <div className="flex items-center text-xs sm:text-sm text-muted-foreground">
-                    <Calendar className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                    <span className="hidden sm:inline">{new Date(prompt.createdAt).toLocaleDateString()}</span>
-                    <span className="sm:hidden">{new Date(prompt.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
-                  </div>
-                  <Button
-                    onClick={() => handleGenerate(prompt)}
-                    disabled={!selectedFile || generating}
-                    size="sm"
-                    className="w-full sm:w-auto min-h-[48px] text-base"
-                  >
-                    {generating && selectedPrompt?.id === prompt.id && !isRandomGeneration ? (
-                      <>
-                        <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                        <span className="hidden sm:inline">Gerando...</span>
-                        <span className="sm:hidden">Ger...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="h-5 w-5 mr-2" />
-                        Gerar
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+          )}
         </div>
       )}
 
-      {/* Generation Status */}
-      {generating && (
-        <Card className="border-primary">
-          <CardContent className="pt-6">
-            <div className="flex items-center space-x-3">
-              <Loader2 className="h-5 w-5 animate-spin text-primary" />
-              <div>
-                <p className="font-medium">Gerando imagem...</p>
-                <p className="text-sm text-muted-foreground">
-                  {isRandomGeneration
-                    ? 'Usando um prompt aleatório do banco de dados'
-                    : selectedPrompt
-                      ? `Usando prompt: "${selectedPrompt.title}"`
-                      : 'Processando...'
-                  }
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Error Message */}
+      {error && (
+        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 text-center">
+          <p className="text-destructive text-sm">{error}</p>
+        </div>
       )}
+
+      {/* Prompt Selector Modal */}
+      <Dialog open={showPromptSelector} onOpenChange={setShowPromptSelector}>
+        <DialogContent className="max-w-[96vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <Sparkles className="h-5 w-5 mr-2" />
+              Escolher Prompt
+              {rouletteResult && (
+                <span className="ml-2 text-sm font-normal text-muted-foreground">
+                  ({availablePrompts.length} na categoria "{rouletteResult.categoryLabel}")
+                </span>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            {availablePrompts.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <p>Nenhum prompt disponível</p>
+                {rouletteResult && (
+                  <p className="text-sm mt-2">
+                    Não há prompts na categoria "{rouletteResult.categoryLabel}"
+                  </p>
+                )}
+              </div>
+            ) : (
+              availablePrompts.map((prompt) => (
+                <button
+                  key={prompt.id}
+                  onClick={() => {
+                    setSelectedPrompt(prompt)
+                    setShowPromptSelector(false)
+                  }}
+                  className="w-full text-left p-4 rounded-lg border hover:bg-muted/50 transition-colors"
+                >
+                  <div className="font-medium">{prompt.title}</div>
+                  <div className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                    {prompt.prompt}
+                  </div>
+                  {prompt.category && (
+                    <div className="text-xs text-muted-foreground mt-2">
+                      {prompt.category}
+                    </div>
+                  )}
+                </button>
+              ))
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Camera Modal */}
       <Dialog open={showCamera} onOpenChange={(open) => !open && stopCamera()}>
