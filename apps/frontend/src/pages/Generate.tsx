@@ -190,9 +190,9 @@ export default function Generate() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold">Generate Images</h1>
+    <div className="space-y-4 sm:space-y-6 pb-4">
+      <div className="space-y-1 sm:space-y-2">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Generate Images</h1>
         <p className="text-sm sm:text-base text-muted-foreground">
           Upload an image or take a photo and select a prompt to generate a new AI image
         </p>
@@ -200,20 +200,20 @@ export default function Generate() {
 
       {/* File Upload Section */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
+        <CardHeader className="pb-3 sm:pb-6">
+          <CardTitle className="flex items-center text-base sm:text-lg">
             <Upload className="h-5 w-5 mr-2" />
             Upload Base Image
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-sm">
             Select an image file or take a photo that will be used as the base for generation
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <div>
               <div className="text-sm font-medium mb-2">Image File</div>
-              <div className="flex flex-col sm:flex-row gap-2">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <div className="flex-1">
                   <Input
                     id="photo"
@@ -221,24 +221,24 @@ export default function Generate() {
                     accept="image/*"
                     onChange={handleFileSelect}
                     ref={fileInputRef}
-                    className="min-h-[44px]"
+                    className="min-h-[48px] text-sm"
                   />
                 </div>
                 <Button
                   onClick={startCamera}
                   variant="outline"
                   size="default"
-                  className="px-3 min-h-[44px] w-full sm:w-auto"
+                  className="min-h-[48px] w-full sm:w-auto px-4 text-base"
                 >
-                  <Camera className="h-4 w-4 mr-2 sm:mr-0" />
-                  <span className="sm:hidden">Take Photo</span>
+                  <Camera className="h-5 w-5 mr-2" />
+                  <span>Take Photo</span>
                 </Button>
               </div>
             </div>
             {capturedImage && (
               <div className="space-y-2">
                 <div className="text-sm font-medium">Captured Photo</div>
-                <div className="relative w-24 h-24 sm:w-32 sm:h-32 bg-muted rounded-lg overflow-hidden">
+                <div className="relative w-28 h-28 sm:w-32 sm:h-32 bg-muted rounded-lg overflow-hidden shadow-sm">
                   <img
                     src={capturedImage}
                     alt="Captured"
@@ -249,33 +249,33 @@ export default function Generate() {
                   onClick={retakePhoto}
                   variant="outline"
                   size="sm"
-                  className="min-h-[44px]"
+                  className="min-h-[48px] text-base"
                 >
                   Retake Photo
                 </Button>
               </div>
             )}
             {selectedFile && !capturedImage && (
-              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                <ImageIcon className="h-4 w-4" />
-                <span>{selectedFile.name}</span>
+              <div className="flex items-center space-x-2 text-sm text-muted-foreground bg-muted/50 rounded-md p-3">
+                <ImageIcon className="h-4 w-4 flex-shrink-0" />
+                <span className="truncate">{selectedFile.name}</span>
               </div>
             )}
             <Button
               onClick={handleRandomGenerate}
               disabled={!selectedFile || generating}
-              className="w-full min-h-[44px]"
+              className="w-full min-h-[48px] text-base"
               variant="outline"
             >
               {generating && isRandomGeneration ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader2 className="h-5 w-5 mr-2 animate-spin" />
                   <span className="hidden sm:inline">Generating Random...</span>
                   <span className="sm:hidden">Generating...</span>
                 </>
               ) : (
                 <>
-                  <Shuffle className="h-4 w-4 mr-2" />
+                  <Shuffle className="h-5 w-5 mr-2" />
                   <span className="hidden sm:inline">Generate with Random Prompt</span>
                   <span className="sm:hidden">Random Generate</span>
                 </>
@@ -295,39 +295,42 @@ export default function Generate() {
 
       {prompts.length === 0 ? (
         <Card>
-          <CardContent className="text-center py-12">
-            <Sparkles className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-            <p className="text-muted-foreground mb-2">No prompts available</p>
-            <p className="text-sm text-muted-foreground mb-4">
+          <CardContent className="text-center py-8 sm:py-12 px-4">
+            <Sparkles className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4 text-muted-foreground" />
+            <p className="text-muted-foreground mb-2 text-sm sm:text-base">No prompts available</p>
+            <p className="text-xs sm:text-sm text-muted-foreground mb-4">
               Create some prompts first to generate images
             </p>
-            <Button onClick={() => window.location.href = '/prompts'}>
+            <Button
+              onClick={() => window.location.href = '/prompts'}
+              className="min-h-[48px] text-base"
+            >
               Create Prompts
             </Button>
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {prompts.map((prompt) => (
             <Card key={prompt.id} className="group hover:shadow-md transition-shadow">
-              <CardHeader className="p-4 sm:p-6">
+              <CardHeader className="p-3 sm:p-4 md:p-6">
                 <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <span className="truncate text-base sm:text-lg">{prompt.title}</span>
+                  <span className="truncate text-sm sm:text-base md:text-lg">{prompt.title}</span>
                   {prompt.person_count > 0 && (
-                    <div className="flex items-center text-sm text-muted-foreground self-start sm:self-center">
+                    <div className="flex items-center text-xs sm:text-sm text-muted-foreground self-start sm:self-center">
                       <User className="h-4 w-4 mr-1" />
                       {prompt.person_count}
                     </div>
                   )}
                 </CardTitle>
-                <CardDescription className="line-clamp-3 text-sm">
+                <CardDescription className="line-clamp-3 text-xs sm:text-sm">
                   {prompt.prompt}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="p-4 sm:p-6 pt-0">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3">
                   <div className="flex items-center text-xs sm:text-sm text-muted-foreground">
-                    <Calendar className="h-4 w-4 mr-1" />
+                    <Calendar className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                     <span className="hidden sm:inline">{new Date(prompt.createdAt).toLocaleDateString()}</span>
                     <span className="sm:hidden">{new Date(prompt.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                   </div>
@@ -335,17 +338,17 @@ export default function Generate() {
                     onClick={() => handleGenerate(prompt)}
                     disabled={!selectedFile || generating}
                     size="sm"
-                    className="w-full sm:w-auto min-h-[44px]"
+                    className="w-full sm:w-auto min-h-[48px] text-base"
                   >
                     {generating && selectedPrompt?.id === prompt.id && !isRandomGeneration ? (
                       <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        <Loader2 className="h-5 w-5 mr-2 animate-spin" />
                         <span className="hidden sm:inline">Generating...</span>
                         <span className="sm:hidden">Gen...</span>
                       </>
                     ) : (
                       <>
-                        <Sparkles className="h-4 w-4 mr-2" />
+                        <Sparkles className="h-5 w-5 mr-2" />
                         Generate
                       </>
                     )}
@@ -381,22 +384,22 @@ export default function Generate() {
 
       {/* Camera Modal */}
       <Dialog open={showCamera} onOpenChange={(open) => !open && stopCamera()}>
-        <DialogContent className="max-w-[95vw] sm:max-w-lg max-h-[95vh] p-3 sm:p-6">
-          <DialogHeader>
-            <DialogTitle className="flex items-center text-lg">
+        <DialogContent className="max-w-[96vw] sm:max-w-lg max-h-[90vh] p-4 sm:p-6 overflow-y-auto">
+          <DialogHeader className="pb-2">
+            <DialogTitle className="flex items-center text-base sm:text-lg">
               <Camera className="h-5 w-5 mr-2" />
               Take Photo
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {!capturedImage ? (
               <>
-                <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
+                <div className="relative w-full bg-black rounded-lg overflow-hidden" style={{ maxHeight: 'calc(90vh - 200px)', minHeight: '300px' }}>
                   {cameraLoading && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
                       <div className="text-white text-center">
                         <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
-                        <p>Starting camera...</p>
+                        <p className="text-sm">Starting camera...</p>
                       </div>
                     </div>
                   )}
@@ -405,40 +408,40 @@ export default function Generate() {
                     autoPlay
                     playsInline
                     muted
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                   />
                 </div>
-                <div className="flex justify-center">
+                <div className="flex justify-center py-2">
                   <Button
                     onClick={capturePhoto}
                     size="lg"
-                    className="rounded-full h-14 w-14 sm:h-16 sm:w-16 p-0"
+                    className="rounded-full h-16 w-16 sm:h-20 sm:w-20 p-0 shadow-lg"
                     disabled={cameraLoading}
                   >
-                    <Camera className="h-5 w-5 sm:h-6 sm:w-6" />
+                    <Camera className="h-6 w-6 sm:h-8 sm:w-8" />
                   </Button>
                 </div>
               </>
             ) : (
               <>
-                <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
+                <div className="relative w-full bg-muted rounded-lg overflow-hidden" style={{ maxHeight: 'calc(90vh - 200px)', minHeight: '300px' }}>
                   <img
                     src={capturedImage}
                     alt="Captured"
                     className="w-full h-full object-contain"
                   />
                 </div>
-                <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
                   <Button
                     onClick={retakePhoto}
                     variant="outline"
-                    className="w-full sm:w-auto min-h-[44px]"
+                    className="w-full sm:w-auto min-h-[48px] text-base"
                   >
                     Retake
                   </Button>
                   <Button
                     onClick={stopCamera}
-                    className="w-full sm:w-auto min-h-[44px]"
+                    className="w-full sm:w-auto min-h-[48px] text-base"
                   >
                     Use Photo
                   </Button>
@@ -453,15 +456,15 @@ export default function Generate() {
       {/* Generation Result Dialog */}
       <Dialog open={showResult} onOpenChange={setShowResult}>
         {generatedPhoto && (
-          <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[95vh] p-3 sm:p-6">
-            <DialogHeader>
-              <DialogTitle className="flex items-center text-lg">
+          <DialogContent className="max-w-[96vw] sm:max-w-2xl max-h-[90vh] p-4 sm:p-6 overflow-y-auto">
+            <DialogHeader className="pb-2">
+              <DialogTitle className="flex items-center text-base sm:text-lg">
                 <ImageIcon className="h-5 w-5 mr-2" />
                 Image Generated Successfully!
               </DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
-              <div className="aspect-video bg-muted rounded-lg overflow-hidden">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="w-full bg-muted rounded-lg overflow-hidden" style={{ maxHeight: 'calc(90vh - 220px)', minHeight: '250px' }}>
                 <img
                   src={generatedPhoto.path}
                   alt={generatedPhoto.prompt.title}
@@ -472,9 +475,9 @@ export default function Generate() {
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div>
-                  <h4 className="font-medium">{generatedPhoto.prompt.title}</h4>
+                  <h4 className="font-medium text-sm sm:text-base">{generatedPhoto.prompt.title}</h4>
                   {/* <p className="text-sm text-muted-foreground">
                     {generatedPhoto.prompt.prompt}
                   </p> */}
@@ -484,17 +487,17 @@ export default function Generate() {
                   <p className="text-xs sm:text-sm text-muted-foreground">
                     Generated: {new Date(generatedPhoto.createdAt).toLocaleString()}
                   </p>
-                  <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-2">
                     <Button
                       variant="outline"
                       onClick={() => window.location.href = '/gallery'}
-                      className="w-full sm:w-auto min-h-[44px]"
+                      className="w-full sm:w-auto min-h-[48px] text-base"
                     >
                       View Gallery
                     </Button>
                     <Button
                       onClick={() => setShowResult(false)}
-                      className="w-full sm:w-auto min-h-[44px]"
+                      className="w-full sm:w-auto min-h-[48px] text-base"
                     >
                       Generate Another
                     </Button>

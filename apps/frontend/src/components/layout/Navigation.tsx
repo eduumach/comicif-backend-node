@@ -19,60 +19,64 @@ export default function Navigation() {
   }
 
   return (
-    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
+    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+      <div className="container mx-auto px-3 sm:px-4">
+        <div className="flex h-14 sm:h-16 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2" onClick={closeMobileMenu}>
-            <Palette className="h-6 w-6" />
-            <span className="font-bold text-xl">ComicIF</span>
+          <Link to="/" className="flex items-center space-x-2 min-h-[44px]" onClick={closeMobileMenu}>
+            <Palette className="h-5 w-5 sm:h-6 sm:w-6" />
+            <span className="font-bold text-lg sm:text-xl">ComicIF</span>
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
             <Button
-              variant={isActive('/') ? 'default' : 'ghost'}
+              variant={isActive('/') || isActive('/gallery') ? 'default' : 'ghost'}
               size="sm"
               asChild
             >
               <Link to="/">
-                <Home className="h-4 w-4 mr-2" />
-                Home
-              </Link>
-            </Button>
-
-            <Button
-              variant={isActive('/prompts') ? 'default' : 'ghost'}
-              size="sm"
-              asChild
-            >
-              <Link to="/prompts">
-                <Sparkles className="h-4 w-4 mr-2" />
-                Prompts
-              </Link>
-            </Button>
-
-            <Button
-              variant={isActive('/gallery') ? 'default' : 'ghost'}
-              size="sm"
-              asChild
-            >
-              <Link to="/gallery">
                 <ImageIcon className="h-4 w-4 mr-2" />
                 Gallery
               </Link>
             </Button>
 
             <Button
-              variant={isActive('/generate') ? 'default' : 'ghost'}
+              variant={isActive('/home') ? 'default' : 'ghost'}
               size="sm"
               asChild
             >
-              <Link to="/generate">
-                <Palette className="h-4 w-4 mr-2" />
-                Generate
+              <Link to="/home">
+                <Home className="h-4 w-4 mr-2" />
+                About
               </Link>
             </Button>
+
+            {isAuthenticated && (
+              <>
+                <Button
+                  variant={isActive('/admin/prompts') ? 'default' : 'ghost'}
+                  size="sm"
+                  asChild
+                >
+                  <Link to="/admin/prompts">
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Prompts
+                  </Link>
+                </Button>
+
+                <Button
+                  variant={isActive('/admin/generate') ? 'default' : 'ghost'}
+                  size="sm"
+                  asChild
+                >
+                  <Link to="/admin/generate">
+                    <Palette className="h-4 w-4 mr-2" />
+                    Generate
+                  </Link>
+                </Button>
+              </>
+            )}
 
             <div className="border-l pl-4">
               {isAuthenticated ? (
@@ -103,13 +107,14 @@ export default function Navigation() {
           <Button
             variant="ghost"
             size="sm"
-            className="md:hidden h-10 w-10 p-0"
+            className="md:hidden h-11 w-11 p-0"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
           >
             {mobileMenuOpen ? (
-              <X className="h-5 w-5" />
+              <X className="h-6 w-6" />
             ) : (
-              <Menu className="h-5 w-5" />
+              <Menu className="h-6 w-6" />
             )}
           </Button>
         </div>
@@ -117,54 +122,58 @@ export default function Navigation() {
         {/* Mobile Navigation Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden border-t bg-background/95 backdrop-blur">
-            <div className="px-2 pt-2 pb-3 space-y-1">
+            <div className="px-2 pt-2 pb-3 space-y-1.5">
               <Button
-                variant={isActive('/') ? 'default' : 'ghost'}
+                variant={isActive('/') || isActive('/gallery') ? 'default' : 'ghost'}
                 size="sm"
                 asChild
-                className="w-full justify-start h-12"
+                className="w-full justify-start h-12 text-base"
               >
                 <Link to="/" onClick={closeMobileMenu}>
-                  <Home className="h-5 w-5 mr-3" />
-                  Home
-                </Link>
-              </Button>
-
-              <Button
-                variant={isActive('/prompts') ? 'default' : 'ghost'}
-                size="sm"
-                asChild
-                className="w-full justify-start h-12"
-              >
-                <Link to="/prompts" onClick={closeMobileMenu}>
-                  <Sparkles className="h-5 w-5 mr-3" />
-                  Prompts
-                </Link>
-              </Button>
-
-              <Button
-                variant={isActive('/gallery') ? 'default' : 'ghost'}
-                size="sm"
-                asChild
-                className="w-full justify-start h-12"
-              >
-                <Link to="/gallery" onClick={closeMobileMenu}>
                   <ImageIcon className="h-5 w-5 mr-3" />
                   Gallery
                 </Link>
               </Button>
 
               <Button
-                variant={isActive('/generate') ? 'default' : 'ghost'}
+                variant={isActive('/home') ? 'default' : 'ghost'}
                 size="sm"
                 asChild
-                className="w-full justify-start h-12"
+                className="w-full justify-start h-12 text-base"
               >
-                <Link to="/generate" onClick={closeMobileMenu}>
-                  <Palette className="h-5 w-5 mr-3" />
-                  Generate
+                <Link to="/home" onClick={closeMobileMenu}>
+                  <Home className="h-5 w-5 mr-3" />
+                  About
                 </Link>
               </Button>
+
+              {isAuthenticated && (
+                <>
+                  <Button
+                    variant={isActive('/admin/prompts') ? 'default' : 'ghost'}
+                    size="sm"
+                    asChild
+                    className="w-full justify-start h-12 text-base"
+                  >
+                    <Link to="/admin/prompts" onClick={closeMobileMenu}>
+                      <Sparkles className="h-5 w-5 mr-3" />
+                      Prompts
+                    </Link>
+                  </Button>
+
+                  <Button
+                    variant={isActive('/admin/generate') ? 'default' : 'ghost'}
+                    size="sm"
+                    asChild
+                    className="w-full justify-start h-12 text-base"
+                  >
+                    <Link to="/admin/generate" onClick={closeMobileMenu}>
+                      <Palette className="h-5 w-5 mr-3" />
+                      Generate
+                    </Link>
+                  </Button>
+                </>
+              )}
 
               <div className="border-t pt-2 mt-2">
                 {isAuthenticated ? (
@@ -175,7 +184,7 @@ export default function Navigation() {
                       logout()
                       closeMobileMenu()
                     }}
-                    className="w-full justify-start h-12"
+                    className="w-full justify-start h-12 text-base"
                   >
                     <LogOut className="h-5 w-5 mr-3" />
                     Logout
@@ -185,7 +194,7 @@ export default function Navigation() {
                     variant="ghost"
                     size="sm"
                     asChild
-                    className="w-full justify-start h-12"
+                    className="w-full justify-start h-12 text-base"
                   >
                     <Link to="/login" onClick={closeMobileMenu}>
                       <LogIn className="h-5 w-5 mr-3" />

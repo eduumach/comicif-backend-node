@@ -17,18 +17,19 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/event-carousel" element={<EventCarousel />} />
           <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
+            <Route index element={<Gallery />} />
+            <Route path="gallery" element={<Gallery />} />
+            <Route path="home" element={<Home />} />
             <Route
-              path="prompts"
+              path="admin/prompts"
               element={
                 <ProtectedRoute>
                   <Prompts />
                 </ProtectedRoute>
               }
             />
-            <Route path="gallery" element={<Gallery />} />
             <Route
-              path="generate"
+              path="admin/generate"
               element={
                 <ProtectedRoute>
                   <Generate />
