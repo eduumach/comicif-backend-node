@@ -513,7 +513,7 @@ export default function Generate() {
               <div className="w-full bg-muted rounded-lg overflow-hidden" style={{ maxHeight: 'calc(90vh - 220px)', minHeight: '250px' }}>
                 <img
                   src={generatedPhoto.path}
-                  alt={generatedPhoto.prompt.title}
+                  alt={generatedPhoto.prompt?.title || 'Generated image'}
                   className="w-full h-full object-contain"
                   onError={(e) => {
                     e.currentTarget.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23f3f4f6"/><text x="50" y="50" text-anchor="middle" dy=".3em" fill="%236b7280">No Image</text></svg>'
@@ -523,7 +523,7 @@ export default function Generate() {
 
               <div className="space-y-3">
                 <div>
-                  <h4 className="font-medium text-sm sm:text-base">{generatedPhoto.prompt.title}</h4>
+                  <h4 className="font-medium text-sm sm:text-base">{generatedPhoto.prompt?.title}</h4>
                   {/* <p className="text-sm text-muted-foreground">
                     {generatedPhoto.prompt.prompt}
                   </p> */}
