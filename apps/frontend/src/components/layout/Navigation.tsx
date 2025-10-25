@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Link, useLocation } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
 import ThemeToggle from "@/components/ThemeToggle"
-import { Home, ImageIcon, Palette, Sparkles, LogIn, LogOut, Menu, X, Dices, Camera } from "lucide-react"
+import { ImageIcon, Palette, Sparkles, LogIn, LogOut, Menu, X, Dices, Camera } from "lucide-react"
 
 export default function Navigation() {
   const location = useLocation()
