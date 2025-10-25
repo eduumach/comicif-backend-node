@@ -6,10 +6,10 @@ export class Photo {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ type: 'varchar', length: 1000, nullable: true })
+    @Column({ type: 'varchar', length: 1000 })
     path: string;
 
-    @Column({ type: 'int', nullable: true, default: 0 })
+    @Column({ type: 'int', default: 0 })
     likes: number;
 
     @Column({ type: 'varchar', length: 50, default: 'generated' })

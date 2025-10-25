@@ -159,9 +159,19 @@ export const likePhoto = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Increment likes
-    photo.likes += 1;
-    const updatedPhoto = await photoRepository.save(photo);
+    // Increment likes using update to avoid overwriting other fields
+    await photoRepository.update(photoId, { likes: photo.likes + 1 });
+    
+    // Reload the photo to get the updated data
+    const updatedPhoto = await photoRepository.findOne({
+      where: { id: photoId },
+      relations: ['prompt']
+    });
+
+    if (!updatedPhoto) {
+      res.status(404).json({ error: 'Erro ao atualizar foto' });
+      return;
+    }
 
     // Get file URL
     const link = await minioService.getFileUrl(updatedPhoto.path);
