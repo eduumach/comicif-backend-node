@@ -42,7 +42,7 @@ export default function Navigation() {
               </Link>
             </Button>
 
-            <Button
+            {/* <Button
               variant={isActive('/home') ? 'default' : 'ghost'}
               size="sm"
               asChild
@@ -51,7 +51,7 @@ export default function Navigation() {
                 <Home className="h-4 w-4 mr-2" />
                 Sobre
               </Link>
-            </Button>
+            </Button> */}
 
             {isAdmin && (
               <Button
@@ -168,7 +168,7 @@ export default function Navigation() {
                 </Link>
               </Button>
 
-              <Button
+              {/* <Button
                 variant={isActive('/home') ? 'default' : 'ghost'}
                 size="sm"
                 asChild
@@ -178,7 +178,7 @@ export default function Navigation() {
                   <Home className="h-5 w-5 mr-3" />
                   Sobre
                 </Link>
-              </Button>
+              </Button> */}
 
               {isAdmin && (
                 <Button

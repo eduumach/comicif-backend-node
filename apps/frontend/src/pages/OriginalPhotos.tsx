@@ -289,9 +289,9 @@ export default function OriginalPhotos() {
 
       {/* Success Message */}
       {uploadSuccess && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-          <CheckCircle2 className="h-8 w-8 text-green-600 mx-auto mb-2" />
-          <p className="text-green-900 font-medium">Foto salva com sucesso!</p>
+        <div className="bg-green-500/10 dark:bg-green-500/20 border border-green-500/30 dark:border-green-500/40 rounded-lg p-4 text-center">
+          <CheckCircle2 className="h-8 w-8 text-green-600 dark:text-green-400 mx-auto mb-2" />
+          <p className="text-green-900 dark:text-green-100 font-medium">Foto salva com sucesso!</p>
         </div>
       )}
 

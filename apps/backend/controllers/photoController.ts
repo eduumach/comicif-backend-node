@@ -366,3 +366,54 @@ export const deletePhoto = async (req: Request, res: Response): Promise<void> =>
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
 };
+
+export const getRandomPhoto = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const photoRepository = databaseService.getDataSource().getRepository(Photo);
+
+    // Get total count of photos with non-null path
+    const totalCount = await photoRepository
+      .createQueryBuilder('photo')
+      .where('photo.path IS NOT NULL')
+      .getCount();
+
+    if (totalCount === 0) {
+      res.status(404).json({ error: 'Nenhuma foto encontrada' });
+      return;
+    }
+
+    // Get a random photo
+    const randomPhoto = await photoRepository
+      .createQueryBuilder('photo')
+      .leftJoinAndSelect('photo.prompt', 'prompt')
+      .where('photo.path IS NOT NULL')
+      .orderBy('RANDOM()')
+      .getOne();
+
+    if (!randomPhoto) {
+      res.status(404).json({ error: 'Nenhuma foto encontrada' });
+      return;
+    }
+
+    const link = await minioService.getFileUrl(randomPhoto.path);
+
+    res.json({
+      id: randomPhoto.id,
+      path: link,
+      likes: randomPhoto.likes,
+      type: randomPhoto.type,
+      createdAt: randomPhoto.createdAt,
+      updatedAt: randomPhoto.updatedAt,
+      prompt: randomPhoto.prompt ? {
+        id: randomPhoto.prompt.id,
+        title: randomPhoto.prompt.title,
+        prompt: randomPhoto.prompt.prompt,
+        category: randomPhoto.prompt.category
+      } : null
+    });
+
+  } catch (error) {
+    console.error('Erro ao buscar foto aleatória:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+};

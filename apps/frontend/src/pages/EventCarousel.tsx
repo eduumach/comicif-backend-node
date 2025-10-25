@@ -1,36 +1,40 @@
 import { useState, useEffect, useCallback } from "react"
-import { useRealTimePhotos } from "@/hooks/useRealTimePhotos"
-import { ChevronLeft, ChevronRight, Play, Pause, Wifi, WifiOff } from "lucide-react"
+import { useRandomPhoto } from "@/hooks/useRandomPhoto"
+import { ChevronLeft, ChevronRight, Play, Pause } from "lucide-react"
 
 export default function EventCarousel() {
-  const { photos, loading, connected } = useRealTimePhotos()
-  const [currentIndex, setCurrentIndex] = useState(0)
   const [isPlaying, setIsPlaying] = useState(true)
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [showControls, setShowControls] = useState(false)
   const [mouseTimer, setMouseTimer] = useState<number | null>(null)
 
+  // Use the random photo hook with auto-fetch disabled (we'll control it manually)
+  const { currentPhoto, loading, fetchRandomPhoto } = useRandomPhoto(false, 0)
+
+  // Manual fetch with transition effect
+  const fetchWithTransition = useCallback(async () => {
+    setIsTransitioning(true)
+    await fetchRandomPhoto()
+    setTimeout(() => {
+      setIsTransitioning(false)
+    }, 300)
+  }, [fetchRandomPhoto])
+
+  // Initial fetch
+  useEffect(() => {
+    fetchWithTransition()
+  }, [])
+
   // Auto-advance timer (7 seconds per image)
   useEffect(() => {
-    if (!isPlaying || photos.length === 0) return
+    if (!isPlaying || !currentPhoto) return
 
     const timer = setInterval(() => {
-      setIsTransitioning(true)
-      setTimeout(() => {
-        setCurrentIndex((prev) => (prev + 1) % photos.length)
-        setIsTransitioning(false)
-      }, 300) // Transition duration
+      fetchWithTransition()
     }, 7000) // 7 seconds per image
 
     return () => clearInterval(timer)
-  }, [isPlaying, photos.length])
-
-  // Reset current index when new photos are added
-  useEffect(() => {
-    if (photos.length > 0 && currentIndex >= photos.length) {
-      setCurrentIndex(0)
-    }
-  }, [photos.length, currentIndex])
+  }, [isPlaying, currentPhoto, fetchWithTransition])
 
   // Keyboard controls
   const handleKeyPress = useCallback((e: KeyboardEvent) => {
@@ -40,20 +44,9 @@ export default function EventCarousel() {
         setIsPlaying(prev => !prev)
         break
       case 'ArrowLeft':
-        e.preventDefault()
-        setIsTransitioning(true)
-        setTimeout(() => {
-          setCurrentIndex((prev) => (prev - 1 + photos.length) % photos.length)
-          setIsTransitioning(false)
-        }, 300)
-        break
       case 'ArrowRight':
         e.preventDefault()
-        setIsTransitioning(true)
-        setTimeout(() => {
-          setCurrentIndex((prev) => (prev + 1) % photos.length)
-          setIsTransitioning(false)
-        }, 300)
+        fetchWithTransition()
         break
       case 'Escape':
         e.preventDefault()
@@ -65,7 +58,7 @@ export default function EventCarousel() {
         }
         break
     }
-  }, [photos.length])
+  }, [fetchWithTransition])
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyPress)
@@ -120,19 +113,11 @@ export default function EventCarousel() {
   }, [])
 
   const nextImage = () => {
-    setIsTransitioning(true)
-    setTimeout(() => {
-      setCurrentIndex((prev) => (prev + 1) % photos.length)
-      setIsTransitioning(false)
-    }, 300)
+    fetchWithTransition()
   }
 
   const previousImage = () => {
-    setIsTransitioning(true)
-    setTimeout(() => {
-      setCurrentIndex((prev) => (prev - 1 + photos.length) % photos.length)
-      setIsTransitioning(false)
-    }, 300)
+    fetchWithTransition()
   }
 
   const togglePlayPause = () => {
@@ -145,37 +130,22 @@ export default function EventCarousel() {
         <div className="text-white text-2xl text-center">
           <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <div className="mb-4">Carregando...</div>
-          <div className="text-lg opacity-70">Conectando ao servidor...</div>
+          <div className="text-lg opacity-70">Buscando fotos...</div>
         </div>
       </div>
     )
   }
 
-  if (photos.length === 0) {
+  if (!currentPhoto) {
     return (
       <div className="fixed inset-0 bg-black flex items-center justify-center">
         <div className="text-white text-2xl text-center">
           <div className="mb-4">Aguardando imagens...</div>
           <div className="text-lg opacity-70">As imagens geradas aparecerão aqui automaticamente</div>
-          <div className="mt-4 flex items-center justify-center">
-            {connected ? (
-              <div className="flex items-center text-green-400 text-sm">
-                <Wifi className="w-4 h-4 mr-2" />
-                Conectado - Atualizações em tempo real
-              </div>
-            ) : (
-              <div className="flex items-center text-yellow-400 text-sm">
-                <WifiOff className="w-4 h-4 mr-2" />
-                Modo offline - Buscando atualizações...
-              </div>
-            )}
-          </div>
         </div>
       </div>
     )
   }
-
-  const currentPhoto = photos[currentIndex]
 
   return (
     <div className="fixed inset-0 bg-black overflow-hidden cursor-none">
@@ -231,7 +201,6 @@ export default function EventCarousel() {
         {/* Info Panel */}
         <div className="absolute bottom-4 right-4 bg-black/70 text-white p-4 rounded-lg max-w-sm">
           <h3 className="font-medium mb-1">{currentPhoto.prompt?.title || 'Foto Original'}</h3>
-          <p className="text-sm opacity-80">{currentIndex + 1} de {photos.length}</p>
           <p className="text-xs opacity-60 mt-1">
             {new Date(currentPhoto.createdAt).toLocaleString('pt-BR')}
           </p>
@@ -254,33 +223,10 @@ export default function EventCarousel() {
               <span className="text-sm">{isPlaying ? 'Reproduzindo' : 'Pausado'}</span>
             </div>
           </div>
-          <div className="bg-black/70 text-white p-3 rounded-lg">
-            <div className="flex items-center space-x-2">
-              {connected ? (
-                <>
-                  <Wifi className="w-4 h-4 text-green-400" />
-                  <span className="text-sm">Tempo Real</span>
-                </>
-              ) : (
-                <>
-                  <WifiOff className="w-4 h-4 text-yellow-400" />
-                  <span className="text-sm">Polling</span>
-                </>
-              )}
-            </div>
-          </div>
         </div>
       </div>
 
-      {/* Progress Bar */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
-        <div
-          className="h-full bg-white transition-all duration-100 ease-linear"
-          style={{
-            width: `${((currentIndex + 1) / photos.length) * 100}%`
-          }}
-        ></div>
-      </div>
+      {/* Progress Bar - removed since we don't have a fixed sequence anymore */}
     </div>
   )
 }
