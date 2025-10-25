@@ -70,6 +70,20 @@ export function useInfinitePhotos(filters: PhotoFilters = {}) {
     }
   }
 
+  const deletePhoto = async (id: number) => {
+    try {
+      setError(null)
+      await photoService.delete(id)
+      // Remove a foto da lista e atualiza o total
+      setPhotos(prev => prev.filter(p => p.id !== id))
+      setTotalCount(prev => prev - 1)
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to delete photo'
+      setError(errorMessage)
+      throw new Error(errorMessage)
+    }
+  }
+
   const refetch = useCallback(() => {
     setPage(1)
     fetchPhotos(1, false)
@@ -90,6 +104,7 @@ export function useInfinitePhotos(filters: PhotoFilters = {}) {
     totalCount,
     loadMore,
     likePhoto,
+    deletePhoto,
     refetch,
   }
 }

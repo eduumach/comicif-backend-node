@@ -321,3 +321,48 @@ export const getPhotosSince = async (req: Request, res: Response): Promise<void>
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
 };
+
+export const deletePhoto = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const photoId = parseInt(req.params.id);
+
+    if (isNaN(photoId)) {
+      res.status(400).json({ error: 'ID da foto inválido' });
+      return;
+    }
+
+    const photoRepository = databaseService.getDataSource().getRepository(Photo);
+
+    const photo = await photoRepository.findOne({
+      where: { id: photoId }
+    });
+
+    if (!photo) {
+      res.status(404).json({ error: 'Foto não encontrada' });
+      return;
+    }
+
+    // Delete file from MinIO
+    try {
+      await minioService.deleteFile(photo.path);
+    } catch (error) {
+      console.error('Erro ao deletar arquivo do MinIO:', error);
+      // Continue even if MinIO deletion fails
+    }
+
+    // Delete photo from database
+    await photoRepository.remove(photo);
+
+    // Emit delete photo event to all connected clients
+    io.emit('delete-photo', { id: photoId });
+
+    res.json({
+      message: 'Foto deletada com sucesso',
+      id: photoId
+    });
+
+  } catch (error) {
+    console.error('Erro ao deletar foto:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+};

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { generatePhotoFromPrompt, listPhotos, likePhoto, generatePhotoFromPromptId, getPhotosSince } from '../controllers/photoController';
+import { generatePhotoFromPrompt, listPhotos, likePhoto, generatePhotoFromPromptId, getPhotosSince, deletePhoto } from '../controllers/photoController';
 import { authMiddleware, adminOnlyMiddleware } from '../middleware/auth';
 import multer from 'multer';
 
@@ -28,5 +28,7 @@ router.post('/:id/like', likePhoto);
 router.post('/generate', authMiddleware, adminOnlyMiddleware, upload.single('photo'), generatePhotoFromPrompt);
 router.post('/generate-from-prompt-id', authMiddleware, adminOnlyMiddleware, upload.single('photo'), generatePhotoFromPromptId);
 
+// Admin only routes
+router.delete('/:id', authMiddleware, adminOnlyMiddleware, deletePhoto);
 
 export default router;

@@ -4,17 +4,31 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useInfinitePhotos } from "@/hooks/useInfinitePhotos"
+import { useAuth } from "@/contexts/AuthContext"
 import type { Photo } from "@/services/photos"
 import { MediaCategory, MediaCategoryLabels } from "@/types/MediaCategory"
-import { Heart, Loader2, Calendar, Download, Filter } from "lucide-react"
+import { Heart, Loader2, Calendar, Download, Filter, Trash2 } from "lucide-react"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 export default function Gallery() {
+  const { isAdmin } = useAuth()
   const [typeFilter, setTypeFilter] = useState<'all' | 'generated' | 'original'>('all')
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null)
   const [likingPhoto, setLikingPhoto] = useState<number | null>(null)
+  const [deletingPhoto, setDeletingPhoto] = useState<number | null>(null)
+  const [photoToDelete, setPhotoToDelete] = useState<Photo | null>(null)
   
-  const { photos, loading, loadingMore, error, hasMore, totalCount, loadMore, likePhoto } = useInfinitePhotos({
+  const { photos, loading, loadingMore, error, hasMore, totalCount, loadMore, likePhoto, deletePhoto } = useInfinitePhotos({
     type: typeFilter,
     category: categoryFilter === 'all' ? undefined : categoryFilter,
     limit: 20
@@ -84,6 +98,29 @@ export default function Gallery() {
       window.URL.revokeObjectURL(url)
     } catch (error) {
       console.error('Error downloading image:', error)
+    }
+  }
+
+  const handleDeleteClick = (photo: Photo, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setPhotoToDelete(photo)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!photoToDelete) return
+    
+    setDeletingPhoto(photoToDelete.id)
+    try {
+      await deletePhoto(photoToDelete.id)
+      // Se a foto deletada era a foto selecionada no dialog, fecha o dialog
+      if (selectedPhoto?.id === photoToDelete.id) {
+        setSelectedPhoto(null)
+      }
+    } catch (err) {
+      console.error('Error deleting photo:', err)
+    } finally {
+      setDeletingPhoto(null)
+      setPhotoToDelete(null)
     }
   }
 
@@ -226,6 +263,21 @@ export default function Gallery() {
                       <span>{new Date(photo.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                     </div>
                     <div className="flex gap-2">
+                      {isAdmin && (
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={(e) => handleDeleteClick(photo, e)}
+                          disabled={deletingPhoto === photo.id}
+                          className="h-8 px-2 sm:px-3 bg-red-500/80 hover:bg-red-600/80 text-white border-0 backdrop-blur-sm"
+                        >
+                          {deletingPhoto === photo.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4" />
+                          )}
+                        </Button>
+                      )}
                       <Button
                         size="sm"
                         variant="secondary"
@@ -360,12 +412,58 @@ export default function Gallery() {
                       <span className="hidden sm:inline">Baixar</span>
                     </Button>
                   </div>
+
+                  {/* Delete button for admin - Full width */}
+                  {isAdmin && (
+                    <Button
+                      variant="destructive"
+                      onClick={(e) => handleDeleteClick(selectedPhoto, e)}
+                      disabled={deletingPhoto === selectedPhoto.id}
+                      size="lg"
+                      className="w-full min-h-[52px] sm:min-h-[48px] text-base touch-manipulation mt-2"
+                    >
+                      {deletingPhoto === selectedPhoto.id ? (
+                        <Loader2 className="h-5 w-5 sm:mr-2 animate-spin" />
+                      ) : (
+                        <>
+                          <Trash2 className="h-5 w-5 sm:mr-2" />
+                          <span>Deletar Foto</span>
+                        </>
+                      )}
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
           </DialogContent>
         )}
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!photoToDelete} onOpenChange={(open) => !open && setPhotoToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. A foto será permanentemente deletada do servidor.
+              {photoToDelete?.prompt?.title && (
+                <span className="block mt-2 font-semibold">
+                  Foto: {photoToDelete.prompt.title}
+                </span>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+            >
+              Deletar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

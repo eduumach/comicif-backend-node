@@ -87,4 +87,9 @@ export const photoService = {
     const response = await api.post(`/photos/${id}/like`);
     return response.data;
   },
+
+  // Delete a photo (admin only)
+  delete: async (id: number): Promise<void> => {
+    await api.delete(`/photos/${id}`);
+  },
 };
