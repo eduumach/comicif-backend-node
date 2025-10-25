@@ -167,7 +167,7 @@ export default function Generate() {
 
       if (context) {
         context.drawImage(video, 0, 0)
-        const imageDataUrl = canvas.toDataURL('image/jpeg', 0.8)
+        const imageDataUrl = canvas.toDataURL('image/jpeg', 0.95)
         setCapturedImage(imageDataUrl)
 
         canvas.toBlob((blob) => {
@@ -175,7 +175,7 @@ export default function Generate() {
             const file = new File([blob], 'camera-capture.jpg', { type: 'image/jpeg' })
             setSelectedFile(file)
           }
-        }, 'image/jpeg', 0.8)
+        }, 'image/jpeg', 0.95)
       }
     }
   }
