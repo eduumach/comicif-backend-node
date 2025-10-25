@@ -190,12 +190,17 @@ export default function Roulette() {
         </Card>
       )}
 
-      <Tabs defaultValue="categories" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="prompts">Roleta de Prompts</TabsTrigger>
-          <TabsTrigger value="category-prompt">Categoria → Prompt</TabsTrigger>
-          <TabsTrigger value="categories">Roleta de Categorias</TabsTrigger>
-
+      <Tabs defaultValue="category-prompt" className="w-full">
+        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 h-auto">
+          <TabsTrigger value="prompts" className="text-xs sm:text-sm whitespace-nowrap">
+            Roleta de Prompts
+          </TabsTrigger>
+          <TabsTrigger value="category-prompt" className="text-xs sm:text-sm whitespace-nowrap">
+            Categoria → Prompt
+          </TabsTrigger>
+          <TabsTrigger value="categories" className="text-xs sm:text-sm whitespace-nowrap">
+            Roleta de Categorias
+          </TabsTrigger>
         </TabsList>
 
         {/* Tab: Roleta de Categorias */}
